@@ -1,0 +1,26 @@
+{
+    "name": "opent2t",
+    "version": "1.0.0",
+    "description": "Command Line Interface (CLI) for Open Translators to Things.",
+    "bin": {
+        "opent2t": "./index.js"
+    },
+    "dependencies": {
+        "commander": "^2.9.0",
+        "colors": "^1.1.2"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "preferGlobal": true,
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/openT2T/cli.git"
+    },
+    "author": "Open Translators to Things",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/openT2T/cli/issues"
+    },
+    "homepage": "https://github.com/openT2T/cli#readme"
+}

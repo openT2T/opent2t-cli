@@ -1,0 +1,10 @@
+# package manager and tooling directories
+node_modules
+typings
+
+# miscellaneous
+.tmp
+.sass-cache
+*.DS_Store
+logs
+*.log
