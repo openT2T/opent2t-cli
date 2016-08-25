@@ -1,6 +1,6 @@
 {
   "name": "opent2t-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Command Line Interface (CLI) for Open Translators to Things.",
   "bin": {
     "opent2t": "./index.js"
@@ -8,7 +8,7 @@
   "dependencies": {
     "colors": "^1.1.2",
     "commander": "^2.9.0",
-    "opent2t": "^0.1.0"
+    "opent2t": "^1.0.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
