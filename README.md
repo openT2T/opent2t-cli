@@ -20,7 +20,7 @@ Get your dev environment set up (PC or Mac):
 We recommend that you install the CLI globally.
 
 ```bash
-$ npm install –g openT2T
+$ npm install –g opent2t-cli
 ```
 
 ## Get the Source
@@ -29,7 +29,7 @@ Next, clone this repo to your local machine to get started. Navigate to the dire
 to locally, then run:
 
 ```bash
-git clone https://github.com/openT2T/cli.git
+git clone https://github.com/openT2T/opent2t-cli.git
 ```
 
 ## Create a New Translator, Schema or Onboarding Module
@@ -42,7 +42,7 @@ You can run a translator locally with the CLI. This includes translators impleme
 
 ```
 $ cd contosoBulb/js
-$ openT2T run 
+$ opent2t-cli run 
 ***************************************************
 Open Translators to Things CLI:
 See http://www.opentranslatorstothings.org
@@ -88,7 +88,7 @@ and all methods referenced in the schema are implemented with the correct signat
 
 ```
 $ cd contosoBulb
-$ openT2T validate
+$ opent2t-cli validate
 ***************************************************
 Open Translators to Things CLI:
 See http://www.opentranslatorstothings.org
