@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-opent2t",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "eslint configuration module for Open Translators to Things",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,19 @@
         "type": "git",
         "url": "git+https://github.com/openT2T/cli.git"
     },
-     "bugs": {
+    "bugs": {
         "url": "https://github.com/openT2T/cli/issues"
+    },
+    "keywords": [
+      "eslint",
+      "eslintconfig",
+      "config",
+      "opent2t"
+    ],
+    "devDependencies": {
+      "eslint": "^3.3.1"
+    },
+    "peerDependencies": {
+      "eslint": "^3.3.1"
     }
 }
