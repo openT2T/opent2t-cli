@@ -8,3 +8,6 @@ typings
 *.DS_Store
 logs
 *.log
+*_device_*.json
+*_onboardingInfo*.json
+.vscode/

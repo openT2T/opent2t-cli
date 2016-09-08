@@ -23,63 +23,49 @@ We recommend that you install the CLI globally.
 $ npm install –g opent2t-cli
 ```
 
-## Get the Source
-
-Next, clone this repo to your local machine to get started. Navigate to the directory where you want to clone the repo
-to locally, then run:
-
-```bash
-git clone https://github.com/openT2T/opent2t-cli.git
-```
-
-## Create a New Translator, Schema or Onboarding Module
-
-> The generator-opent2t yeoman starter should be used to create new translators, schemas or onboarding modules.
-
 ## Run a Translator Locally
 
-You can run a translator locally with the CLI. This includes translators implemented by others, whose git repos you sync locally, or your own translators as you develop them.
+You can run a translator locally with the CLI. 
 
+1. identify a translator you want to run, wink thermostat, and install it
+```bash
+npm install opent2t-translator-com-wink-thermostat
 ```
-$ cd contosoBulb/js
-$ opent2t-cli run 
-***************************************************
-Open Translators to Things CLI:
-See http://www.opentranslatorstothings.org
-***************************************************
-Running lamp schema implementation for contosoBulb.
-```
-
-The user is prompted for some information, e.g. the credentials to access the device, the device ID, etc. This information is part of the "onboarding" or initial setup/pairing of the device which is done by whatever runtime the translator runs in. The user can also opt to save this information locally in a file called deviceSetup.json. If this file exists already, then the CLI reads setup information from it rather than prompting the user. The deviceSetup.json file is added to the local .gitignore as well, since it contains device setup information which is unique to each specific device/user and should not be checked into source control.
-
-> Note: The prompts for access token etc below are generated via the node onboarding module for the Thing. 
-
-```
-The following setup information is required by contosoBulb:
-Access Token? XYZABC
-Refresh Token? XYZ123
-Would you like to save this information locally, so you don't have to enter it again? Y
-local file deviceSetup.json created, and added to .gitignore.
-All done, now running contosoBulb. Methods avaible are:
-1. OnOff(state)
-2. Dim(luminosity)
-enter ctrl-c to exit.
-contosoBulb $>
+2. start the cli, first step is to do the onboarding. Wink communicates via the hub so you need to set that up first
+```bash
+node index.js -o opent2t-translator-com-wink-hub
 ```
 
-After the user specifies all the setup information required by the translator, it starts running locally. The user is presented with a 
-[REPL](https://nodejs.org/api/repl.html) where they can call all the methods declared in the translator schema. This is useful during development, where you want to test out your script, e.g.:
-
+You'll be prompted for some info:
+```bash
+? Type in your Wink username
+? Type in your Wink password
+?  Ask for Client ID
+?  Ask for Client Secret
 ```
-contosoBulb $> OnOff(true)
+
+You should see the output of the CLI and it ends with the following:
+```bash
+Saving onboaringInfo to: ./opent2t-translator-com-wink-hub_onboardingInfo.json
+Saved!
 ```
+After this, you're access token info has been saved so you should not have to do this step again.
 
-If all is well, the REPL above will execute the provided valid node.js statement and call the OnOff method with the argument true.
-This will perhaps turn the bulb on, if that's what the schema intends and what the deviceTranslator.js implements.
+3. Enumerate devices on the hub, find the thermostat id
+```bash
+node index.js -h opent2t-translator-com-wink-hub
+```
+This will print out the devices that the hub sees and also creates json files so the cli can use this info later.
 
-## Debugging
-
-> We need community participation to complete this section and write debugging tools / emulators especially tailored for common devices.
+4. Get the thermostat info
+```bash
+node index.js -h opent2t-translator-com-wink-hub -t opent2t-translator-com-wink-thermostat -i 152846 -p ThermostatResURI
+```
+Let's break this call down:
+* -h is the hub you're communicating through
+* -t is the device type you want to talk to
+* -i is the id of the specific device you want to talk to
+* -p is the RAML schema/method you want to call 
 
 ## Validate a Translator
 
@@ -96,10 +82,6 @@ See http://www.opentranslatorstothings.org
 Validating lamp schema implementation for contosoBulb
 All good! No validation errors found.
 ```
-
-## Create a Pull Request
-Made any changes we should consider? Send us a pull request! Check out [this article](https://help.github.com/articles/creating-a-pull-request/)
-on how to get started.
 
 ## Code of Conduct
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
