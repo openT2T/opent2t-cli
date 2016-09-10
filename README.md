@@ -27,11 +27,11 @@ $ npm install –g opent2t-cli
 
 You can run a translator locally with the CLI. 
 
-1. identify a translator you want to run, wink thermostat, and install it
+1. Identify a translator you want to run, ie wink thermostat, and install it
 ```bash
 npm install opent2t-translator-com-wink-thermostat
 ```
-2. start the cli, first step is to do the onboarding. Wink communicates via the hub so you need to set that up first
+2. First step is to do the onboarding. Wink communicates via the hub so you need to set that up first
 ```bash
 node index.js -o opent2t-translator-com-wink-hub
 ```
@@ -40,8 +40,8 @@ You'll be prompted for some info:
 ```bash
 ? Type in your Wink username
 ? Type in your Wink password
-?  Ask for Client ID
-?  Ask for Client Secret
+? Ask for Client ID
+? Ask for Client Secret
 ```
 
 You should see the output of the CLI and it ends with the following:
@@ -49,39 +49,28 @@ You should see the output of the CLI and it ends with the following:
 Saving onboaringInfo to: ./opent2t-translator-com-wink-hub_onboardingInfo.json
 Saved!
 ```
-After this, you're access token info has been saved so you should not have to do this step again.
+After this, your access token info has been saved so you should not have to do this step again.
 
-3. Enumerate devices on the hub, find the thermostat id
+3. Enumerate devices on the hub and find the device id you want to use (in this case the thermostat)
 ```bash
 node index.js -h opent2t-translator-com-wink-hub
 ```
 This will print out the devices that the hub sees and also creates json files so the cli can use this info later.
 
+```bash
+------ Saving device "152846" to: "opent2t-translator-com-wink-thermostat_device_152846.json"
+------ Saving device "1985159" to: "opent2t-translator-com-wink-lightbulb_device_1985159.json"
+```
+
 4. Get the thermostat info
 ```bash
-node index.js -h opent2t-translator-com-wink-hub -t opent2t-translator-com-wink-thermostat -i 152846 -p ThermostatResURI
+node index.js -h opent2t-translator-com-wink-hub -t opent2t-translator-com-wink-thermostat -i 152846 -g ThermostatResURI
 ```
 Let's break this call down:
 * -h is the hub you're communicating through
 * -t is the device type you want to talk to
 * -i is the id of the specific device you want to talk to
-* -p is the RAML schema/method you want to call 
-
-## Validate a Translator
-
-We provide an easy way to run a quick validation of a translator. This does not perform an end to end test of your implementation, but will at least check to make sure all required files exist,
-and all methods referenced in the schema are implemented with the correct signature, etc.
-
-```
-$ cd contosoBulb
-$ opent2t-cli validate
-***************************************************
-Open Translators to Things CLI:
-See http://www.opentranslatorstothings.org
-***************************************************
-Validating lamp schema implementation for contosoBulb
-All good! No validation errors found.
-```
+* -g is the get RAML method call the cli makes 
 
 ## Code of Conduct
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.

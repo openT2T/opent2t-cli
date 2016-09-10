@@ -2,6 +2,7 @@
 /* jshint node: true */
 'use strict';
 var inquirer = require('inquirer');
+var helpers = require('./helpers');
 var q = require('q');
 var state = "opent2t-cli";
 var cliVars = [{ "key": "*state*", "value": state}];
@@ -9,7 +10,6 @@ var cliVars = [{ "key": "*state*", "value": state}];
 class OnboardingCli {
     constructor() {
         this.OpenT2T = require('opent2t').OpenT2T;
-
     }
 
     // loads the specified translator and performs the onboarding for it
@@ -24,25 +24,21 @@ class OnboardingCli {
             if (p.translators.length > 0) {
 
                 var tinfo = p.translators[0];
-                console.log(JSON.stringify(tinfo, null, 2));
+                console.log("----------------------------- Package Info");
+                helpers.logObject(tinfo);
+                console.log("-----------------------------");
 
-                var inquirerInput = this.convertFlowToInquirer2(tinfo.onboardingFlow);
-                console.log(JSON.stringify(tinfo.onboardingFlow, null, 2));
                 return this.performFlow(tinfo.onboardingFlow).then(answers => {
                     var Onboarding = require(tinfo.onboarding);
                     var onboarding = new Onboarding();
-                    console.log(onboarding);
-                    console.log(JSON.stringify(onboarding, null, 2));
                     return onboarding.onboard(answers);
                 });
 
             }
-        }).catch((error) => {
-            console.log(error);
-            throw error;
         });
     }
 
+    // does the onboarding flow and asks the user any input
     performFlow(onboardingFlow, i, onboardingAnswers) {
         if (!!!i) {
             i = 0;
@@ -52,6 +48,7 @@ class OnboardingCli {
             onboardingAnswers = [];
         }
 
+        // recursive ending condition
         if (i >= onboardingFlow.length) {
             var deferred = q.defer();
             deferred.resolve(onboardingAnswers);
@@ -59,13 +56,10 @@ class OnboardingCli {
         }
 
         var flowItem = onboardingFlow[i];
-        console.log("---------------");
-        console.log(flowItem.name);
-        console.log("---------------");
+        console.log("--------------- %j".header, flowItem.name);
 
         if (flowItem.name === "getDeveloperInput" || flowItem.name === "getUserInput") {
             var inquirerInput = this.convertFlowToInquirer(flowItem);
-            console.log(JSON.stringify(inquirerInput, null, 2));
             return inquirer.prompt(inquirerInput).then(answers => {
                 onboardingAnswers.push(answers);
                 return this.performFlow(onboardingFlow, i + 1, onboardingAnswers);
@@ -91,6 +85,14 @@ class OnboardingCli {
         }
     }
 
+    // this resolves variables in the onboarding flow with dynamic values retreived from the user
+    // takes in a key/value pair array and replces any key found in the string with the value in the array
+    // input
+    // my cool string with *key1* things to replace inside *key2* it
+    // *key1* : value1
+    // *key2* : value2
+    // output
+    // my cool string with value1 things to replace inside value2 it
     replaceVarsInValue(value, replaceVars) {
         var toReturn = value;
         for (var i = 0; i < replaceVars.length; i++) {
@@ -102,12 +104,8 @@ class OnboardingCli {
         return toReturn;
     }
 
+    // given the users answers, creates a *key*/value array
     getReplaceVars(onboardingFlow, answers, i) {
-        console.log("---------------");
-        console.log("answers: " + JSON.stringify(answers, null, 2));
-        console.log("---------------");
-
-
         var replaceVars = cliVars.slice(0);
         for (var j = 0; j < i; j++) {
             var flowItem = onboardingFlow[j];
@@ -149,13 +147,12 @@ class OnboardingCli {
         return inquirerInput;
     }
 
+    // starts a web server at the configured port and waits for /success call
     doWebFlow(url) {
         var deferred = q.defer();
         var open = require('open');
         var express = require('express');
-
         var port = 8080;
-
         var app = express();
 
         app.get("/success", function(req, res) {
@@ -163,8 +160,10 @@ class OnboardingCli {
 
             console.log("State verification: " + (req.query.state === state));
 
+            // load the auth code and return it
+            // todo is this different for different providers?
             var code = req.query.code;
-            console.log(req.query);
+            helpers.logObject(req.query);
             console.log(code);
             deferred.resolve(code);
         });
@@ -177,57 +176,6 @@ class OnboardingCli {
         });
 
         return deferred.promise;
-    }
-
-    // performs inquirer prompts and gets input from user
-    // since we have multiple one level sets, we need to dynamically
-    // ask the user using inquirer
-    getAnswers2(inquirerInput, i, answers) {
-        if (i >= inquirerInput.length) {
-            var deferred = q.defer();
-            deferred.resolve(answers);
-            return deferred.promise;
-        }
-
-        return inquirer.prompt(inquirerInput[i]).then( (subanswers) => {
-            answers.push(subanswers);
-            return this.getAnswers(inquirerInput, i + 1, answers).then( (answers) => {
-                return answers;
-            });
-        });
-    }
-
-    // converts opent2t onboarding flow into multiple inquirer flows
-    // onboardingFlow has two levels, inquirer only handles one level
-    // so we convert into multiple one level sets
-    convertFlowToInquirer2(onboardingFlow) {
-        var inquirerInput = [];
-        for (var i = 0; i < onboardingFlow.length; i++) {
-            var flowItem = onboardingFlow[i];
-
-            var subArray = [];
-
-            for (var j = 0; j < flowItem.flow.length; j++) {
-                var element = flowItem.flow[j];
-                var iItem = {};
-
-                if (!!element.type) {
-                    iItem.type = element.type;
-                }
-                else {
-                    iItem.type = "input";
-                }
-
-                iItem.name = element.name;
-                iItem.message = element.descriptions.en;
-
-                subArray.push(iItem);
-            }
-
-            inquirerInput.push(subArray);
-        }
-
-        return inquirerInput;
     }
 }
 
