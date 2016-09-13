@@ -9,22 +9,23 @@
   "author": "Open Translators to Things",
   "license": "MIT",
   "repository": {
-        "type": "git",
-        "url": "git+https://github.com/openT2T/cli.git"
-    },
-    "bugs": {
-        "url": "https://github.com/openT2T/cli/issues"
-    },
-    "keywords": [
-      "eslint",
-      "eslintconfig",
-      "config",
-      "opent2t"
-    ],
-    "devDependencies": {
-      "eslint": "^3.3.1"
-    },
-    "peerDependencies": {
-      "eslint": "^3.3.1"
-    }
+    "type": "git",
+    "url": "git+https://github.com/openT2T/cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/openT2T/cli/issues"
+  },
+  "keywords": [
+    "eslint",
+    "eslintconfig",
+    "config",
+    "opent2t"
+  ],
+  "devDependencies": {
+    "eslint": "^3.3.1",
+    "babel-eslint": "^6.1.2"
+  },
+  "peerDependencies": {
+    "eslint": "^3.3.1"
+  }
 }
