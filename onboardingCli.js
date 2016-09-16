@@ -5,7 +5,7 @@ var inquirer = require('inquirer');
 var helpers = require('./helpers');
 var q = require('q');
 var state = "opent2t-cli";
-var cliVars = [{ "key": "*state*", "value": state}];
+var cliVars = [{ "key": "{state}", "value": state}];
 
 class OnboardingCli {
     constructor() {
@@ -88,9 +88,9 @@ class OnboardingCli {
     // this resolves variables in the onboarding flow with dynamic values retreived from the user
     // takes in a key/value pair array and replces any key found in the string with the value in the array
     // input
-    // my cool string with *key1* things to replace inside *key2* it
-    // *key1* : value1
-    // *key2* : value2
+    // my cool string with {key1} things to replace inside {key2} it
+    // {key1} : value1
+    // {key2} : value2
     // output
     // my cool string with value1 things to replace inside value2 it
     replaceVarsInValue(value, replaceVars) {
@@ -104,7 +104,7 @@ class OnboardingCli {
         return toReturn;
     }
 
-    // given the users answers, creates a *key*/value array
+    // given the users answers, creates a {key}/value array
     getReplaceVars(onboardingFlow, answers, i) {
         var replaceVars = cliVars.slice(0);
         for (var j = 0; j < i; j++) {
@@ -113,7 +113,7 @@ class OnboardingCli {
             for (var k = 0; k < flowItem.flow.length; k++) {
                 var element = flowItem.flow[k];
 
-                var replaceItem = { "key": "*" + element.name + "*", "value": answers[j][element.name]};
+                var replaceItem = { "key": "{" + element.name + "}", "value": answers[j][element.name]};
                 replaceVars.push(replaceItem);
             }
         }
