@@ -28,20 +28,15 @@ program
     .option('-g --get [RAML property name]', 'Property name to GET for -t')
     .option('-s --set [RAML property name]', 'Property name to SET for -t')
     .option('-v --value [value]', 'Stringified JSON value to pass in')
-    .option('-q, --test', 'testing only, do not use')
     .parse(process.argv);
 
 console.log('Open Translators to Things CLI:');
 console.log('');
 
-if (program.test) {
-    // designated to be used for testing out cli scenarios
-}
-
-else if (program.onboarding) {
+if (program.onboarding) {
     console.log("------ Doing onboarding for %j".header, program.onboarding);
     
-    var fileName = "./" + program.onboarding + "_onboardingInfo.json";
+    var fileName = helpers.createOnboardingFileName(program.onboarding);
 
     var onboardingCli = new OnboardingCli();
     onboardingCli.doOnboarding(program.onboarding).then(info => {
@@ -64,11 +59,12 @@ else if (program.onboarding) {
 else if (program.translator && program.hub) {
     console.log("------ Hub + translator for %j %j".header, program.hub, program.translator);
 
-    var fileName = "./" + program.hub + "_onboardingInfo.json";
+    var fileName = helpers.createOnboardingFileName(program.hub);
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => { 
         var deviceInfo = JSON.parse(data);
         translatorCli.createTranslator(program.hub, deviceInfo).then(hub => {
-            var fileName = "./" + program.translator + "_device_" + program.id + ".json";
+            var fileName = helpers.createHubDeviceFileName(program.translator, program.id);
+            //var fileName = "./" + program.translator + "_device_" + program.id + ".json";
             helpers.readFile(fileName, "Please complete hub -h before calling -t").then(data => {
                 var deviceInfo = JSON.parse(data);
                 var dInfo = { 'deviceInfo': deviceInfo, 'hub': hub };
@@ -98,7 +94,7 @@ else if (program.translator && program.hub) {
 else if (program.hub) {
     console.log("------ Hub enumerate devices for %j".header, program.hub);
 
-    var fileName = "./" + program.hub + "_onboardingInfo.json";
+    var fileName = helpers.createOnboardingFileName(program.hub);
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => { 
         var deviceInfo = JSON.parse(data);
         translatorCli.getProperty(program.hub, deviceInfo, 'HubResURI').then(info => {
@@ -116,7 +112,8 @@ else if (program.hub) {
 else if (program.translator) {
     console.log("------ Doing translator for %j".header, program.translator);
 
-    var fileName = "./" + program.translator + "_device_" + program.id + ".json";
+    var fileName = helpers.createHubDeviceFileName(program.translator, program.id);
+    //var fileName = "./" + program.translator + "_device_" + program.id + ".json";
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => { 
         var deviceInfo = JSON.parse(data);
         var dInfo = { 'deviceInfo': deviceInfo, 'hub': undefined };
