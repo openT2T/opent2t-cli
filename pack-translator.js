@@ -3,6 +3,8 @@
 var fs = require("fs");
 var path = require("path");
 var program = require('commander');
+var dom = require('xmldom').DOMParser;
+var xpath = require('xpath');
 
 var LocalPackageSource = require("opent2t/package/LocalPackageSource").LocalPackageSource;
 
@@ -15,6 +17,15 @@ if (program.args.length != 1) {
     program.outputHelp();
 } else {
     packTranslator(program.args[0]);
+}
+
+function getSchemasFromManifest(manifestPath) {
+    var doc = new dom().parseFromString(fs.readFileSync(manifestPath).toString());
+    var schemaNodes = xpath.select("//manifest/schemas/schema[not(@main) or @main='false']/@id", doc, false);
+
+    return schemaNodes.map(s => {
+        return s.value + "/*";
+    });
 }
 
 function packTranslator(name) {
@@ -30,6 +41,7 @@ function packTranslator(name) {
 
         var packageTranslatorInfo = packageInfo.translators[0];
         var packageJsonPath = packageTranslatorInfo.moduleName.replace("/thingTranslator", "/package.json");
+        var manifestPath = packageTranslatorInfo.moduleName.replace("/thingTranslator", "/manifest.xml");
         var packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
         LocalPackageSource.mergePackageInfo(packageJson, packageInfo);
 
@@ -44,6 +56,8 @@ function packTranslator(name) {
             schemaName + "/*.js",
             schemaName + "/" + translatorName
         ];
+
+        packageJson.files = packageJson.files.concat(getSchemasFromManifest(manifestPath));
 
         fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2), "utf8");
         console.log("Generated ./package.json file for " + packageJson.name + ".\n" +
