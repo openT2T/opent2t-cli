@@ -111,7 +111,7 @@ else if (program.hub) {
     var fileName = helpers.createOnboardingFileName(program.hub);
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => { 
         var deviceInfo = JSON.parse(data);
-        translatorCli.getProperty(program.hub, deviceInfo, 'get').then(info => {
+        translatorCli.getProperty(program.hub, deviceInfo, 'getPlatforms').then(info => {
             helpers.logObject(info);
             helpers.writeArrayToFile(info.platforms, "_device_", "controlId");
         }).catch(error => {
