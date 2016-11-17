@@ -18,9 +18,9 @@ function writeArrayToFile(arrayObject, fileNameBase, propertyToAppend, i) {
     
     let item = arrayObject[i];
     
-    let fileName = item.openT2T.translator + fileNameBase + item[propertyToAppend] + ".json";
+    let fileName = item.opent2t.translator + fileNameBase + item.opent2t[propertyToAppend] + ".json";
 
-    console.log("------ Saving device %j to: %j", item[propertyToAppend], fileName); 
+    console.log("------ Saving device %j to: %j", item.opent2t[propertyToAppend], fileName); 
     let contents = JSON.stringify(item);
     fs.writeFile(fileName, contents, function (err, data) {
         if (err) {
@@ -55,8 +55,12 @@ function readFile(fileName, errorMessage) {
 // logs the given error in red
 function logError(error) {
     // do anything special
+    console.log("");
     console.log(colors.red("***************** Error Received *****************"));
     console.log(colors.red(error));
+    if (error.stack) {
+        console.log(colors.red(error.stack));
+    }
 }
 
 
