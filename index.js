@@ -24,7 +24,8 @@ program
     .option('-h --hub [Hub Package Name]', 'Gets devices for the given hub')
     
     .option('-t --translator [Translator Package Name]', 'Do get property for specified thing, requires -p')
-    .option('-i --id [Device id]', 'Device id you want to use')
+    .option('-i --id [Control id]', 'Control id you want to use')
+    .option('-d --di [Device id]', 'Device id of the resource you want to control')
     .option('-g --get [RAML property name]', 'Property name to GET for -t')
     .option('-s --set [RAML property name]', 'Property name to SET for -t')
     .option('-v --value [value]', 'Stringified JSON value to pass in')
@@ -59,26 +60,39 @@ if (program.onboarding) {
 else if (program.translator && program.hub) {
     console.log("------ Hub + translator for %j %j".header, program.hub, program.translator);
 
+    if (program.id === undefined) {
+        console.log("Need to provide id, -i <id>");
+        return;
+    }
+
     var fileName = helpers.createOnboardingFileName(program.hub);
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => { 
         var deviceInfo = JSON.parse(data);
         translatorCli.createTranslator(program.hub, deviceInfo).then(hub => {
             var fileName = helpers.createHubDeviceFileName(program.translator, program.id);
             //var fileName = "./" + program.translator + "_device_" + program.id + ".json";
+            console.log(fileName);
             helpers.readFile(fileName, "Please complete hub -h before calling -t").then(data => {
                 var deviceInfo = JSON.parse(data);
                 var dInfo = { 'deviceInfo': deviceInfo, 'hub': hub };
                 
                 if (program.get) {
-                    translatorCli.getProperty(program.translator, dInfo, program.get).then(info => {
+                    translatorCli.getProperty(program.translator, dInfo, program.get, true).then(info => {
                         helpers.logObject(info);
                     }).catch(error => {
                         helpers.logError(error);
                     });
                 }
                 else if (program.set) {
-                    var parsedValue = JSON.parse(program.value);
-                    translatorCli.setProperty(program.translator, dInfo, program.set, parsedValue).then(info => {
+                    var parsedValue = undefined;
+                    try {
+                        parsedValue = JSON.parse(program.value);
+                    } catch (e) {
+                        helpers.logError("Failed to parse JSON: " + program.value);
+                        return;
+                    }
+
+                    translatorCli.setProperty(program.translator, dInfo, program.set, program.di, parsedValue).then(info => {
                         helpers.logObject(info)
                     }).catch(error => {
                         helpers.logError(error);
@@ -97,9 +111,9 @@ else if (program.hub) {
     var fileName = helpers.createOnboardingFileName(program.hub);
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => { 
         var deviceInfo = JSON.parse(data);
-        translatorCli.getProperty(program.hub, deviceInfo, 'HubResURI').then(info => {
+        translatorCli.getProperty(program.hub, deviceInfo, 'getPlatforms').then(info => {
             helpers.logObject(info);
-            helpers.writeArrayToFile(info.devices, "_device_", "id");
+            helpers.writeArrayToFile(info.platforms, "_device_", "controlId");
         }).catch(error => {
             helpers.logError(error);
         });
