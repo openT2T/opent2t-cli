@@ -38,6 +38,26 @@ class OnboardingCli {
         });
     }
 
+    loadTranslatorAndGetOnboardingAnswers(translatorName){
+        var LocalPackageSourceClass = require('opent2t/package/LocalPackageSource').LocalPackageSource;
+        var localPackageSource = new LocalPackageSourceClass("./node_modules/" + translatorName);
+
+        return localPackageSource.getAllPackageInfoAsync().then((packages) => {
+
+            // default use the first package
+            var p = packages[0];
+            if (p.translators.length > 0) {
+
+                var tinfo = p.translators[0];
+                console.log("----------------------------- Package Info");
+                helpers.logObject(tinfo);
+                console.log("-----------------------------");
+
+                return this.performFlow(tinfo.onboardingFlow);
+            }
+        });
+    }
+
     // does the onboarding flow and asks the user any input
     performFlow(onboardingFlow, i, onboardingAnswers) {
         if (!!!i) {

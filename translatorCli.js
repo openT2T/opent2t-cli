@@ -27,7 +27,7 @@ class TranslatorCli {
             return this.OpenT2T.invokeMethodAsync(translator, "", property, [deviceId, value]);
         });
     }
-
+    
     createTranslator(translatorName, deviceInfo) {
         return this.OpenT2T.createTranslatorAsync(translatorName, deviceInfo).then( translator => {
             return translator;
