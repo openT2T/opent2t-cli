@@ -131,7 +131,16 @@ else if(program.refreshAuthToken){
         var authInfo = JSON.parse(data);
         translatorCli.getProperty(program.refreshAuthToken, authInfo, 'refreshAuthToken', answers).then(refreshedInfo => {
             helpers.logObject(refreshedInfo);
-            //helpers.writeArrayToFile(info.platforms, "_device_", "controlId");
+            console.log("------ Saving refreshed onboardingInfo to: " + fileName); 
+            var refreshedData = JSON.stringify(refreshedInfo);
+            fs.writeFile(fileName, refreshedData, function (err) {
+                if (err) {
+                    console.log(err);
+                    return console.log(err);
+                }
+            console.log("Saved!");
+        });
+
         }).catch(error => {
             helpers.logError(error);
         });

@@ -38,6 +38,7 @@ class OnboardingCli {
     }
 
     // loads the first package found under opent2t/package for a given translator
+    // TODO: refactor doOnboarding to call into this instead to avoid code-duplication
     loadTranslatorAndGetOnboardingAnswers(translatorName){
         var LocalPackageSourceClass = require('opent2t/package/LocalPackageSource').LocalPackageSource;
         var localPackageSource = new LocalPackageSourceClass("./node_modules/" + translatorName);
