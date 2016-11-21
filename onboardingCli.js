@@ -33,7 +33,32 @@ class OnboardingCli {
                     var onboarding = new Onboarding();
                     return onboarding.onboard(answers);
                 });
+            }
+        });
+    }
 
+    // loads the first package found under opent2t/package for a given translator
+    // TODO: refactor doOnboarding to call into this instead to avoid code-duplication
+    loadTranslatorAndGetOnboardingAnswers(translatorName){
+        var LocalPackageSourceClass = require('opent2t/package/LocalPackageSource').LocalPackageSource;
+        var localPackageSource = new LocalPackageSourceClass("./node_modules/" + translatorName);
+
+        return localPackageSource.getAllPackageInfoAsync().then((packages) => {
+
+            // default use the first package
+            var p = packages[0];
+            if (p.translators.length > 0) {
+
+                console.log("----------------------------- Package Info");
+                helpers.logObject(tinfo);
+                console.log("-----------------------------");
+                
+                var tinfo = p.translators[0];
+                var onboardingAnswers = ['undefined'];
+                // We only require the clientId/clientSecret for Wink Hub (generalizing this right now)
+                // TODO: See how this differs with SmartThings; If radically different we'd need separate
+                // CLI implementation for WINK and SMARTTHINGS
+                return this.performFlow(tinfo.onboardingFlow, 1, onboardingAnswers);
             }
         });
     }

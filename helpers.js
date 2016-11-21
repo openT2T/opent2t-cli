@@ -63,7 +63,6 @@ function logError(error) {
     }
 }
 
-
 function createHubDeviceFileName(hubName, deviceId) {
     return createSaveFileName(hubName, "_device_" + deviceId);
 }
