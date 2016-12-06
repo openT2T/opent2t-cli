@@ -78,7 +78,14 @@ else if (program.translator && program.hub) {
                 var dInfo = { 'deviceInfo': deviceInfo, 'hub': hub };
                 
                 if (program.get) {
-                    translatorCli.getProperty(program.translator, dInfo, program.get, true).then(info => {
+                    
+                    // If a device/entity id was provided, then pass it, otherwise pass expand=true
+                    var value = true;
+                    if (program.di) {
+                        value = program.di;
+                    }
+
+                    translatorCli.getProperty(program.translator, dInfo, program.get, value).then(info => {
                         helpers.logObject(info);
                     }).catch(error => {
                         helpers.logError(error);
