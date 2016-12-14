@@ -79,7 +79,6 @@ else if (program.translator && program.hub) {
             helpers.readFile(fileName, "Please complete hub -h before calling -t").then(data => {
                 var deviceInfo = JSON.parse(data);
                 var dInfo = { 'deviceInfo': deviceInfo, 'hub': hub };
-                
                 if (program.get) {
                     
                     // If a device/entity id was provided, then pass it, otherwise pass expand=true
@@ -110,12 +109,14 @@ else if (program.translator && program.hub) {
                     });
                 } else if (program.subscribe) {
                     translatorCli.subscribe(program.translator, dInfo, program.subscribe).then(info => {
+                        console.log("test");
                         helpers.logObject(info)
                     }).catch(error => {
+                        console.log("eoops");
                         helpers.logError(error);
                     });
                 } else if (program.unsubscribe) {
-                    translatorCli.subscribe(program.translator, dInfo, program.unsubscribe).then(info => {
+                    translatorCli.unsubscribe(program.translator, dInfo, program.unsubscribe).then(info => {
                         helpers.logObject(info)
                     }).catch(error => {
                         helpers.logError(error);

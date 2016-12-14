@@ -35,7 +35,8 @@ class TranslatorCli {
     }
 
     subscribe(translatorName, deviceInfo, callbackUrl) {
-        helpers.logHeader("Subscribing to " + translatorName + " " + devicId);
+        helpers.logHeader("Subscribing to " + translatorName);
+        helpers.logObject(deviceInfo);
 
         var subscriptionInfo = {};
         subscriptionInfo.callbackUrl = callbackUrl;
