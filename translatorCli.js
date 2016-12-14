@@ -33,6 +33,38 @@ class TranslatorCli {
             return translator;
         }); 
     }
+
+    subscribe(translatorName, deviceInfo, callbackUrl) {
+        helpers.logHeader("Subscribing to " + translatorName + " " + devicId);
+
+        var subscriptionInfo = {};
+        subscriptionInfo.callbackUrl = callbackUrl;
+        helpers.logObject(subscriptionInfo);
+
+        return this.createTranslator(translatorName, deviceInfo).then(translator => {
+            return this.OpenT2T.invokeMethodAsync(translator, "", "postSubscribe", [subscriptionInfo]);
+        });
+    }
+
+    unsubscribe(translatorName, deviceInfo, callbackUrl) {
+        helpers.logHeader("Unsubscribing to " + translatorName + " " + devicId);
+
+        var subscriptionInfo = {};
+        subscriptionInfo.callbackUrl = callbackUrl;
+        helpers.logObject(subscriptionInfo);
+
+        return this.createTranslator(translatorName, deviceInfo).then(translator => {
+            return this.OpenT2T.invokeMethodAsync(translator, "", "deleteSubscribe", [subscriptionInfo]);
+        });
+    }
+
+    translate(translatorName, deviceInfo, payload) {
+        helpers.logHeader("Translating provider formated payload to opent2t");
+
+        return this.createTranslator(translatorName, deviceInfo).then(translator => {
+            return this.OpenT2T.invokeMethodAsync(translator, "", "getPlatforms", [true, payload ]);
+        });
+    }
 }
 
 module.exports = TranslatorCli;

@@ -30,6 +30,9 @@ program
     .option('-g --get [RAML property name]', 'Property name to GET for -t')
     .option('-s --set [RAML property name]', 'Property name to SET for -t')
     .option('-v --value [value]', 'Stringified JSON value to pass in')
+    .option('-n --subscribe [url]', 'Subscribe a URL to notifications from a device')
+    .option('-u --unsubscribe [url]', 'Unsubscribe a URL to notifications from a device')
+    .option('-x --translate', 'Translate a provider formated blob into OpenT2T format')
     .parse(process.argv);
 
 console.log('Open Translators to Things CLI:');
@@ -105,6 +108,18 @@ else if (program.translator && program.hub) {
                     }).catch(error => {
                         helpers.logError(error);
                     });
+                } else if (program.subscribe) {
+                    translatorCli.subscribe(program.translator, dInfo, program.subscribe).then(info => {
+                        helpers.logObject(info)
+                    }).catch(error => {
+                        helpers.logError(error);
+                    });
+                } else if (program.unsubscribe) {
+                    translatorCli.subscribe(program.translator, dInfo, program.unsubscribe).then(info => {
+                        helpers.logObject(info)
+                    }).catch(error => {
+                        helpers.logError(error);
+                    });
                 }
             });
         });
@@ -119,12 +134,22 @@ else if (program.hub) {
     var fileName = helpers.createOnboardingFileName(program.hub);
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => { 
         var deviceInfo = JSON.parse(data);
-        translatorCli.getProperty(program.hub, deviceInfo, 'getPlatforms').then(info => {
-            helpers.logObject(info);
-            helpers.writeArrayToFile(info.platforms, "_device_", "controlId");
-        }).catch(error => {
-            helpers.logError(error);
-        });
+
+        if (program.translate) {
+            translatorCli.getProperty(program.hub, deviceInfo, 'getPlatforms', [true, program.value]).then(info => {
+                helpers.logObject(info);
+            }).catch(error => {
+                helpers.logError(error);
+            });
+            
+        } else {
+            translatorCli.getProperty(program.hub, deviceInfo, 'getPlatforms').then(info => {
+                helpers.logObject(info);
+                helpers.writeArrayToFile(info.platforms, "_device_", "controlId");
+            }).catch(error => {
+                helpers.logError(error);
+            });
+        }
     }).catch(error => {
         helpers.logError(error);
     });
