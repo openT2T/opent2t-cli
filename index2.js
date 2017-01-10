@@ -48,32 +48,29 @@ var mainQuestion = {
     choices: mainChoices
 };
 
-function getDevices() {
+function initializeHub(hubName) {
     let deferred = q.defer();
 
-    if (currentHub.devices === undefined) {
-        var fileName = helpers.createOnboardingFileName(currentHub.name);
-        helpers.readFile(fileName, "Please complete onboarding").then(data => {
-            currentHub.deviceInfo = JSON.parse(data);
-            translatorCli.getProperty(currentHub.name, currentHub.deviceInfo, 'getPlatforms').then(info => {
-                currentHub.platforms = info.platforms;
-                currentHub.devices = [];
-                for (var i = 0; i < info.platforms.length; i++) {
-                    var item = info.platforms[i];
-                    var device = { id: item.opent2t.controlId, name: item.n, translator: item.opent2t.translator };
-                    device.longName = device.name + ' (' + device.translator + ')';
-                    currentHub.devices.push(device);
-                }
-                deferred.resolve();
-            }).catch(error => {
-                deferred.reject(err);
-            });
+    var hub = { name: hubName };
+    var fileName = helpers.createOnboardingFileName(hub.name);
+    helpers.readFile(fileName, "Please complete onboarding").then(data => {
+        hub.deviceInfo = JSON.parse(data);
+        translatorCli.getProperty(hub.name, hub.deviceInfo, 'getPlatforms').then(info => {
+            hub.platforms = info.platforms;
+            hub.devices = [];
+            for (var i = 0; i < info.platforms.length; i++) {
+                var item = info.platforms[i];
+                var device = { id: item.opent2t.controlId, name: item.n, translator: item.opent2t.translator };
+                device.longName = device.name + ' (' + device.translator + ')';
+                hub.devices.push(device);
+            }
+            deferred.resolve(hub);
         }).catch(error => {
             deferred.reject(err);
         });
-    } else {
-        deferred.resolve();
-    }
+    }).catch(error => {
+        deferred.reject(err);
+    });
 
     return deferred.promise;
 }
@@ -143,54 +140,51 @@ function ask() {
             ];
 
             inquirer.prompt(questions).then(function (answers) {
-                currentHub = { name: answers.hubName };
                 mainQuestion.choices = hubChoices;
-                ask();
+                initializeHub(answers.hubName).then(function (hub) {
+                    currentHub = hub;
+                    ask();
+                });
             });
 
         } else if (mainAnswers.mainChoice === 'List devices') {
-            getDevices().then(() => {
-                for (var i = 0; i < currentHub.devices.length; i++) {
-                    var item = currentHub.devices[i];
-                    console.log("%s %s)", item.id, item.longName);
-                }
-                ask();
-            });
+            for (var i = 0; i < currentHub.devices.length; i++) {
+                var item = currentHub.devices[i];
+                console.log("%s %s", item.id, item.longName);
+            }
+            ask();
 
         } else if (mainAnswers.mainChoice === 'Select device') {
-            getDevices().then(() => {
-                var questions = [
-                    {
-                        type: 'rawlist',
-                        name: 'device',
-                        message: 'Which device would you like?',
-                        choices: currentHub.devices.map(d => { return d.longName }),
-                        paginated: true,
+            var questions = [
+                {
+                    type: 'rawlist',
+                    name: 'device',
+                    message: 'Which device would you like?',
+                    choices: currentHub.devices.map(d => { return d.longName }),
+                    paginated: true,
+                }
+            ];
+
+            inquirer.prompt(questions).then(function (answers) {
+                currentDevice = currentHub.devices.find(d => { return d.longName === answers.device });
+                currentDevice.readonlyProperties = [];
+                currentDevice.properties = [];
+                currentDevice.writableProperties = [];
+
+                var deviceInfo = currentHub.platforms.find(p => { return p.opent2t.controlId === currentDevice.id });
+
+                for (var entitiesIndex = 0; entitiesIndex < deviceInfo.entities.length; entitiesIndex++) {
+                    for (var i = 0; i < deviceInfo.entities[entitiesIndex].resources.length; i++) {
+                        var resource = deviceInfo.entities[entitiesIndex].resources[i];
+                        var props = resource.if.indexOf('oic.if.a') === -1 ? currentDevice.readonlyProperties : currentDevice.writableProperties;
+                        var prop = { name: resource.href.substring(1), deviceId: deviceInfo.entities[entitiesIndex].di };
+                        props.push(prop);
+                        currentDevice.properties.push(prop);
                     }
-                ];
+                }
 
-                inquirer.prompt(questions).then(function (answers) {
-                    currentDevice = currentHub.devices.find(d => { return d.longName === answers.device });
-
-                    var deviceInfo = currentHub.platforms.find(p => { return p.opent2t.controlId === currentDevice.id });
-                    currentDevice.readonlyProperties = [];
-                    currentDevice.properties = [];
-                    currentDevice.writableProperties = [];
-
-                    for (var entitiesIndex = 0; entitiesIndex < deviceInfo.entities.length; entitiesIndex++) {
-                        for (var i = 0; i < deviceInfo.entities[entitiesIndex].resources.length; i++) {
-                            var resource = deviceInfo.entities[entitiesIndex].resources[i];
-                            var isWritable = resource.if.indexOf('oic.if.a') !== -1;
-                            var props = resource.if.indexOf('oic.if.a') === -1 ? currentDevice.readonlyProperties : currentDevice.writableProperties;
-                            var prop = { name: resource.href.substring(1), deviceId: deviceInfo.entities[entitiesIndex].di };
-                            props.push(prop);
-                            currentDevice.properties.push(prop);
-                        }
-                    }
-
-                    mainQuestion.choices = deviceChoices;
-                    ask();
-                });
+                mainQuestion.choices = deviceChoices;
+                ask();
             });
 
         } else if (mainAnswers.mainChoice === 'List properties') {
