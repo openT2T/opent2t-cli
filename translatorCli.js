@@ -12,7 +12,7 @@ class TranslatorCli {
 
     // loads the specified translator and performs the onboarding for it
     getProperty(translatorName, deviceInfo, property, value) {
-        //helpers.logHeader("Getting " + property + " from " + translatorName);
+        helpers.logHeader("Getting " + property + " from " + translatorName);
 
         return this.createTranslator(translatorName, deviceInfo).then(translator => {
             return this.OpenT2T.invokeMethodAsync(translator, "", property, [value]);
@@ -20,8 +20,8 @@ class TranslatorCli {
     }
 
     setProperty(translatorName, deviceInfo, property, deviceId, value) {
-        //helpers.logHeader("Setting " + translatorName + " to:");
-        //helpers.logObject(value);
+        helpers.logHeader("Setting " + translatorName + " to:");
+        helpers.logObject(value);
 
         return this.createTranslator(translatorName, deviceInfo).then(translator => {
             return this.OpenT2T.invokeMethodAsync(translator, "", property, [deviceId, value]);
