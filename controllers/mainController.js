@@ -2,28 +2,31 @@
 var inquirer = require('inquirer');
 var q = require('q');
 var fs = require('fs');
-var OnboardingCli = require("./onboardingCli");
-var helpers = require('./helpers');
 var OpenT2T = require('opent2t').OpenT2T;
+var OnboardingCli = require("../onboardingCli");
+var helpers = require('../helpers');
 var BaseController = require("./baseController");
 var HubController = require("./hubController");
 
 class MainController extends BaseController {
-    constructor(hasKnownHubs) {
+    constructor() {
         super();
-        this.addOperation('onboardHub', 'Onboard hub', this.onboardHub);
 
-        if (hasKnownHubs) {
-            this.addHubCommands();
+        this.addOperation('Onboard hub', MainController.onboardHub);
+    }
+
+    getOperations(state) {
+        let extraOperations = [];
+
+        if(state.knownHubs.length > 0) {
+            extraOperations.push(this.createOperation('Refresh oAuth token', MainController.refreshAuthToken));
+            extraOperations.push(this.createOperation('Select hub', MainController.selectHub));
         }
+
+        return this.operations.concat(extraOperations);
     }
 
-    addHubCommands() {
-        this.addOperation('refreshAuthToken', 'Refresh oAuth token', this.refreshAuthToken);
-        this.addOperation('selectHub', 'Select hub', this.selectHub);
-    }
-
-    onboardHub(state) {
+    static onboardHub(state) {
         let deferred = q.defer();
 
         let questions = [
@@ -45,10 +48,6 @@ class MainController extends BaseController {
                     }
                     else {
                         console.log("Saved!");
-                        if (state.knownHubs.length === 0) {
-                            let controller = state.controllerStack[state.controllerStack.length - 1];
-                            controller.addHubCommands();
-                        }
                         state.knownHubs.push(answers.hubPackage);
                         deferred.resolve(state);
                     }
@@ -61,7 +60,7 @@ class MainController extends BaseController {
         return deferred.promise;
     }
 
-    refreshAuthToken(state) {
+    static refreshAuthToken(state) {
         let deferred = q.defer();
 
         let questions = [
@@ -103,7 +102,7 @@ class MainController extends BaseController {
         return deferred.promise;
     }
 
-    selectHub(state) {
+    static selectHub(state) {
         let deferred = q.defer();
 
         let questions = [
@@ -132,8 +131,8 @@ class MainController extends BaseController {
                             hub.devices.push(device);
                         }
                         state.currentHub = hub;
-                        let hubController = new HubController();
-                        state.controllerStack.unshift(hubController);
+                        state.controllerStack.push(state.currentController);
+                        state.currentController = new HubController();
                         deferred.resolve(state);
                     });
                 }).catch(error => {

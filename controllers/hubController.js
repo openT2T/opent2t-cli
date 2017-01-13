@@ -8,24 +8,30 @@ var DeviceController = require("./deviceController");
 class HubController extends BaseController {
     constructor() {
         super();
-        this.addOperation('goBack', 'Back', this.goBack);
-        this.addOperation('listDevices', 'List devices', this.listDevices);
-        this.addOperation('selectDevice', 'Select device', this.selectDevice);
+
+        this.addOperation('Back', this.goBack);
+        this.addOperation('List devices', HubController.listDevices);
+        this.addOperation('Select device', HubController.selectDevice);
     }
 
-    listDevices(state) {
-        let deferred = q.defer();
+    getOperations(state) {
+        return this.operations;
+    }
 
+    logState(state) {
+        console.log("\nCurrent Hub: %s\n".state, state.currentHub.name);
+    }
+
+    static listDevices(state) {
         for (let i = 0; i < state.currentHub.devices.length; i++) {
             let item = state.currentHub.devices[i];
             console.log("%s %s", item.id, item.longName);
         }
 
-        deferred.resolve(state);
-        return deferred.promise;
+        return q.fcall(() => state);
     }
 
-    selectDevice(state) {
+    static selectDevice(state) {
         let deferred = q.defer();
 
         let questions = [
@@ -60,26 +66,14 @@ class HubController extends BaseController {
                 }
 
                 state.currentDevice = device;
-
-                let deviceController = new DeviceController();
-                state.controllerStack.unshift(deviceController);
-
+                state.controllerStack.push(state.currentController);
+                state.currentController = new DeviceController();
                 deferred.resolve(state);
             }).catch(error => {
                 deferred.reject(error);
             });
         });
 
-        return deferred.promise;
-    }
-
-    goBack(state) {
-        let deferred = q.defer();
-
-        state.currentHub = undefined;
-        state.controllerStack.shift();
-
-        deferred.resolve(state);
         return deferred.promise;
     }
 }

@@ -24,9 +24,9 @@ class OnboardingCli {
             if (p.translators.length > 0) {
 
                 var tinfo = p.translators[0];
-                // console.log("----------------------------- Package Info");
-                // helpers.logObject(tinfo);
-                // console.log("-----------------------------");
+                console.log("----------------------------- Package Info");
+                helpers.logObject(tinfo);
+                console.log("-----------------------------");
 
                 return this.performFlow(tinfo.onboardingFlow).then(answers => {
                     var Onboarding = require(tinfo.onboarding);
@@ -49,9 +49,9 @@ class OnboardingCli {
             var p = packages[0];
             if (p.translators.length > 0) {
 
-                // console.log("----------------------------- Package Info");
-                // helpers.logObject(tinfo);
-                // console.log("-----------------------------");
+                console.log("----------------------------- Package Info");
+                helpers.logObject(tinfo);
+                console.log("-----------------------------");
                 
                 var tinfo = p.translators[0];
                 var onboardingAnswers = ['undefined'];

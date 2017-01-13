@@ -1,54 +1,53 @@
 'use strict';
 var inquirer = require('inquirer');
 var q = require('q');
-var helpers = require('./helpers');
 var OpenT2T = require('opent2t').OpenT2T;
-var colors = require('colors');
+var helpers = require('../helpers');
 var BaseController = require("./baseController");
 
 class DeviceController extends BaseController {
     constructor() {
         super();
-        this.addOperation('goBack', 'Back', this.goBack);
-        this.addOperation('showDeviceInfo', 'Display info', this.showDeviceInfo);
-        this.addOperation('listProperties', 'List properties', this.listProperties);
-        this.addOperation('getProperty', 'Get property', this.getProperty);
-        this.addOperation('setProperty', 'Set property', this.setProperty);
-        this.addOperation('invokeMethod', 'Invoke method', this.invokeMethod);
+
+        this.addOperation('Back', this.goBack);
+        this.addOperation('Display info', DeviceController.showDeviceInfo);
+        this.addOperation('List properties', DeviceController.listProperties);
+        this.addOperation('Get property', DeviceController.getProperty);
+        this.addOperation('Set property', DeviceController.setProperty);
+        this.addOperation('Invoke method', DeviceController.invokeMethod);
     }
 
-    showDeviceInfo(state) {
-        let deferred = q.defer();
+    getOperations(state) {
+        return this.operations;
+    }
 
+    logState(state) {
+        console.log("\nCurrent Hub: %s".state, state.currentHub.name);
+        console.log("Current Device: %s\n".state, state.currentDevice.longName);
+    }
+
+    static logProperties(props, message) {
+        if (props.length > 0) {
+            console.log(message.header);
+            for (var i = 0; i < props.length; i++) {
+                console.log(props[i].name);
+            }
+        }
+    }
+
+    static showDeviceInfo(state) {
         let deviceInfo = state.currentHub.platforms.find(p => p.opent2t.controlId === state.currentDevice.id);
         helpers.logObject(deviceInfo);
-
-        deferred.resolve(state);
-        return deferred.promise;
+        return q.fcall(() => state);
     }
 
-    listProperties(state) {
-        let deferred = q.defer();
-
-        if (state.currentDevice.writableProperties.length > 0) {
-            console.log(colors.cyan('Read/Write Properties'));
-            for (var i = 0; i < state.currentDevice.writableProperties.length; i++) {
-                console.log(state.currentDevice.writableProperties[i].name);
-            }
-        }
-
-        if (state.currentDevice.readonlyProperties.length > 0) {
-            console.log(colors.cyan('Read Only Properties'));
-            for (var i = 0; i < state.currentDevice.readonlyProperties.length; i++) {
-                console.log(state.currentDevice.readonlyProperties[i].name);
-            }
-        }
-
-        deferred.resolve(state);
-        return deferred.promise;
+    static listProperties(state) {
+        DeviceController.logProperties(state.currentDevice.writableProperties, "Read/Write Properties");
+        DeviceController.logProperties(state.currentDevice.readonlyProperties, "Read Only Properties");
+        return q.fcall(() => state);
     }
 
-    getProperty(state) {
+    static getProperty(state) {
         let deferred = q.defer();
 
         let questions = [
@@ -56,7 +55,7 @@ class DeviceController extends BaseController {
                 type: 'rawlist',
                 name: 'propName',
                 message: 'Which property would you like?',
-                choices: state.currentDevice.properties.map(p => { return p.name }),
+                choices: state.currentDevice.properties.map(p => p.name),
                 paginated: true,
             }
         ];
@@ -75,7 +74,7 @@ class DeviceController extends BaseController {
         return deferred.promise;
     }
 
-    setProperty(state) {
+    static setProperty(state) {
         let deferred = q.defer();
 
         let questions = [
@@ -83,7 +82,7 @@ class DeviceController extends BaseController {
                 type: 'rawlist',
                 name: 'propName',
                 message: 'Which property would you like to set?',
-                choices: state.currentDevice.writableProperties.map(p => { return p.name }),
+                choices: state.currentDevice.writableProperties.map(p => p.name),
                 paginated: true,
             },
             {
@@ -109,7 +108,7 @@ class DeviceController extends BaseController {
     }
 
 
-    invokeMethod(state) {
+    static invokeMethod(state) {
         let deferred = q.defer();
 
         let questions = [
@@ -135,16 +134,6 @@ class DeviceController extends BaseController {
             });
         });
 
-        return deferred.promise;
-    }
-
-    goBack(state) {
-        let deferred = q.defer();
-
-        state.currentDevice = undefined;
-        state.controllerStack.shift();
-
-        deferred.resolve(state);
         return deferred.promise;
     }
 }
