@@ -39,5 +39,18 @@ function prompt(state) {
                 prompt(state);
             }
         }
+        else {
+            let question = {
+                type: 'confirm',
+                name: 'exit',
+                message: 'Are you sure you want to exit?'
+            };
+
+            inquirer.prompt([question]).then(function (answers) {
+                if(!answers.exit) {
+                    prompt(state);
+                }
+            });
+        }
     });
 }

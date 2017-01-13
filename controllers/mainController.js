@@ -22,7 +22,7 @@ class MainController extends BaseController {
     getOperations(state) {
         let extraOperations = [];
 
-        if(MainController.knownHubs.length > 0) {
+        if (MainController.knownHubs.length > 0) {
             extraOperations.push(this.createOperation('Refresh oAuth token', MainController.refreshAuthToken));
             extraOperations.push(this.createOperation('Select hub', MainController.selectHub));
         }
@@ -42,23 +42,29 @@ class MainController extends BaseController {
         ];
 
         inquirer.prompt(questions).then(function (answers) {
-            let fileName = helpers.createOnboardingFileName(answers.hubPackage);
-            let onboardingCli = new OnboardingCli();
-            onboardingCli.doOnboarding(answers.hubPackage).then(info => {
-                let data = JSON.stringify(info);
-                fs.writeFile(fileName, data, function (err) {
-                    if (err) {
-                        deferred.reject(err);
-                    }
-                    else {
-                        console.log("Saved!");
-                        MainController.knownHubs.push(answers.hubPackage);
-                        deferred.resolve(state);
-                    }
+            if (MainController.knownHubs.indexOf(answers.hubPackage) === -1) {
+                let fileName = helpers.createOnboardingFileName(answers.hubPackage);
+                let onboardingCli = new OnboardingCli();
+                onboardingCli.doOnboarding(answers.hubPackage).then(info => {
+                    let data = JSON.stringify(info);
+                    fs.writeFile(fileName, data, function (err) {
+                        if (err) {
+                            deferred.reject(err);
+                        }
+                        else {
+                            console.log("Saved!");
+                            MainController.knownHubs.push(answers.hubPackage);
+                            deferred.resolve(state);
+                        }
+                    });
+                }).catch(err => {
+                    deferred.reject(err);
                 });
-            }).catch(err => {
-                deferred.reject(err);
-            });
+            }
+            else {
+                console.log("\nHub %s has already been onboarded.\n".header, answers.hubPackage);
+                deferred.resolve(state);
+            }
         });
 
         return deferred.promise;

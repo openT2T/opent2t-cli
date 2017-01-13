@@ -95,13 +95,17 @@ class DeviceController extends BaseController {
         inquirer.prompt(questions).then(function (answers) {
             let prop = state.currentDevice.writableProperties.find(p => p.name === answers.propName);
             let method = 'postDevices' + prop.name.charAt(0).toUpperCase() + prop.name.slice(1);
-            let parsedValue = JSON.parse(answers.value);
-            OpenT2T.invokeMethodAsync(state.currentDevice.translator, "", method, [prop.deviceId, parsedValue]).then(info => {
-                helpers.logObject(info);
-                deferred.resolve(state);
-            }).catch(error => {
+            try {
+                let parsedValue = JSON.parse(answers.value);
+                OpenT2T.invokeMethodAsync(state.currentDevice.translator, "", method, [prop.deviceId, parsedValue]).then(info => {
+                    helpers.logObject(info);
+                    deferred.resolve(state);
+                }).catch(error => {
+                    deferred.reject(error);
+                });
+            } catch (error) {
                 deferred.reject(error);
-            });
+            }
         });
 
         return deferred.promise;
@@ -125,13 +129,17 @@ class DeviceController extends BaseController {
         ];
 
         inquirer.prompt(questions).then(function (answers) {
-            let parsedParams = JSON.parse(answers.params);
-            OpenT2T.invokeMethodAsync(state.currentDevice.translator, "", answers.methodName, parsedParams).then(info => {
-                helpers.logObject(info);
-                deferred.resolve(state);
-            }).catch(error => {
+            try {
+                let parsedParams = JSON.parse(answers.params);
+                OpenT2T.invokeMethodAsync(state.currentDevice.translator, "", answers.methodName, parsedParams).then(info => {
+                    helpers.logObject(info);
+                    deferred.resolve(state);
+                }).catch(error => {
+                    deferred.reject(error);
+                });
+            } catch (error) {
                 deferred.reject(error);
-            });
+            }
         });
 
         return deferred.promise;
