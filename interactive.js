@@ -1,8 +1,6 @@
 'use strict';
 var inquirer = require('inquirer');
 var colors = require('colors');
-var glob = require("glob");
-var path = require('path');
 var q = require('q');
 var helpers = require('./helpers');
 var MainController = require("./controllers/mainController");
@@ -13,14 +11,7 @@ colors.setTheme({
     state: 'yellow'
 });
 
-let state = initializeState();
-prompt(state);
-
-function initializeState() {
-    let hubInfoFiles = glob.sync('./*_onboardingInfo.json');
-    let hubs = hubInfoFiles.map(f => path.basename(f).replace('_onboardingInfo.json', ''));
-    return { currentController: new MainController(), knownHubs: hubs, controllerStack: [] };
-}
+prompt({ currentController: new MainController(), controllerStack: [] });
 
 function prompt(state) {
     state.currentController.logState(state);

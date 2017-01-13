@@ -2,6 +2,8 @@
 var inquirer = require('inquirer');
 var q = require('q');
 var fs = require('fs');
+var glob = require("glob");
+var path = require('path');
 var OpenT2T = require('opent2t').OpenT2T;
 var OnboardingCli = require("../onboardingCli");
 var helpers = require('../helpers');
@@ -12,13 +14,15 @@ class MainController extends BaseController {
     constructor() {
         super();
 
+        let hubInfoFiles = glob.sync('./*_onboardingInfo.json');
+        MainController.knownHubs = hubInfoFiles.map(f => path.basename(f).replace('_onboardingInfo.json', ''));
         this.addOperation('Onboard hub', MainController.onboardHub);
     }
 
     getOperations(state) {
         let extraOperations = [];
 
-        if(state.knownHubs.length > 0) {
+        if(MainController.knownHubs.length > 0) {
             extraOperations.push(this.createOperation('Refresh oAuth token', MainController.refreshAuthToken));
             extraOperations.push(this.createOperation('Select hub', MainController.selectHub));
         }
@@ -48,7 +52,7 @@ class MainController extends BaseController {
                     }
                     else {
                         console.log("Saved!");
-                        state.knownHubs.push(answers.hubPackage);
+                        MainController.knownHubs.push(answers.hubPackage);
                         deferred.resolve(state);
                     }
                 });
@@ -68,7 +72,7 @@ class MainController extends BaseController {
                 type: 'rawlist',
                 name: 'hubPackage',
                 message: 'Select hub to refresh',
-                choices: state.knownHubs
+                choices: MainController.knownHubs
             }
         ];
 
@@ -110,7 +114,7 @@ class MainController extends BaseController {
                 type: 'rawlist',
                 name: 'hubName',
                 message: 'Which hub would you like?',
-                choices: state.knownHubs
+                choices: MainController.knownHubs
             }
         ];
 
