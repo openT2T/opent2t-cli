@@ -1,4 +1,3 @@
-'use strict';
 var inquirer = require('inquirer');
 var colors = require('colors');
 var q = require('q');
@@ -28,6 +27,7 @@ function prompt(state) {
         if (answers.choice !== 'Exit') {
             let choice = operations.find(o => o.name === answers.choice);
             if (choice !== undefined) {
+                process.stdout.write('\033c');
                 choice.operation(state).then(prompt)
                     .catch(err => {
                         helpers.logError(err);
