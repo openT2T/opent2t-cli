@@ -44,17 +44,17 @@ class OnboardingCli {
         var localPackageSource = new LocalPackageSourceClass("./node_modules/" + translatorName);
 
         return localPackageSource.getAllPackageInfoAsync().then((packages) => {
-
+            
             // default use the first package
             var p = packages[0];
             if (p.translators.length > 0) {
 
+                var tinfo = p.translators[0];
                 console.log("----------------------------- Package Info");
                 helpers.logObject(tinfo);
                 console.log("-----------------------------");
                 
-                var tinfo = p.translators[0];
-                var onboardingAnswers = ['undefined'];
+                var onboardingAnswers = [];
                 // We only require the clientId/clientSecret for Wink Hub (generalizing this right now)
                 // TODO: See how this differs with SmartThings; If radically different we'd need separate
                 // CLI implementation for WINK and SMARTTHINGS
@@ -81,6 +81,7 @@ class OnboardingCli {
         }
 
         var flowItem = onboardingFlow[i];
+        console.log(i);
         console.log("--------------- %j".header, flowItem.name);
 
         if (flowItem.name === "getDeveloperInput" || flowItem.name === "getUserInput") {
@@ -91,6 +92,7 @@ class OnboardingCli {
             });
         }
         else if (flowItem.name === "askUserPermission") {
+            console.log(JSON.stringify(onboardingAnswers, null, 2));
             // create the url by resolving variables with values retrieved
             // todo where to put these helper methods?
             var replaceVars = this.getReplaceVars(onboardingFlow, onboardingAnswers, i);
