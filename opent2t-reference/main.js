@@ -64,23 +64,41 @@ app.readFile = function (fileName) {
 app.loadConfigs = function () {
     let deferred = q.defer();
     let filePath = "./configs";
+    let configs = [];
 
-    fs.readdir(filePath, (err, files) => {
+    fs.access(filePath, (err) => {
         if (err) {
-            deferred.reject(err);
+            if (err.code === "ENOENT") {
+                fs.mkdir(filePath, function (e) {
+                    if (err) {
+                        deferred.reject(err);
+                    } else {
+                        deferred.resolve(configs);
+                    }
+                });
+            } else {
+                deferred.reject(err);
+            }
         }
 
-        let promises = [];
-        files.forEach((item, index) => {
-            promises.push(app.readFile(filePath + "/" + item));
-        });
-
-        q.all(promises).then(results => {
-            let configs = [];
-            for (var i = 0; i < results.length; i++) {
-                configs.push(JSON.parse(results[i]));
+        fs.readdir(filePath, (err, files) => {
+            if (err) {
+                deferred.reject(err);
             }
-            deferred.resolve(configs);
+
+            if (files !== undefined) {
+                let promises = [];
+                files.forEach((item, index) => {
+                    promises.push(app.readFile(filePath + "/" + item));
+                });
+
+                q.all(promises).then(results => {
+                    for (var i = 0; i < results.length; i++) {
+                        configs.push(JSON.parse(results[i]));
+                    }
+                    deferred.resolve(configs);
+                });
+            }
         });
     });
 

@@ -305,7 +305,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
                 //This is a workaround because angular doesn't handle binding to array elements well.
                 for (let j = 0; j < platform.entities[0].resources.length; j++) {
                     let resource = platform.entities[0].resources[j];
-                    if (resource.rt[0] === 'oic.r.mode') {
+                    if (resource.rt[0] === 'oic.r.mode' && resource.modes !== undefined) {
                         resource.currentMode = resource.modes[0];
                     }
                 }
