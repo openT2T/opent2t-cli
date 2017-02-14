@@ -11,11 +11,16 @@ var LocalPackageSource = require("opent2t/package/LocalPackageSource").LocalPack
 program
     .version("0.1.0")
     .usage("<translator name>")
+    .option("-o, --onboarder <value>",  "Package on onboarder module")
     .parse(process.argv);
 
-if (program.args.length != 1) {
+if (program.onboarder) {
+        packOnboarder(program.onboarder);
+}
+else if (program.args.length < 1) {
     program.outputHelp();
-} else {
+} 
+else {
     packTranslator(program.args[0]);
 }
 
@@ -65,5 +70,36 @@ function packTranslator(name) {
 
     }).catch (function (error) {
         console.error("Failed to load package info: " + error);
+    });
+}
+
+function packOnboarder(name) {
+    var onboarderPackageName = "org.opent2t.onboarding." + name;
+    var packageFile = path.join(onboarderPackageName, "js", "package.json");
+    var outfile = "./package.json";
+
+    fs.readFile(packageFile, 'utf8', (err, data) => {
+        if (err) {
+            return console.log(err);
+        }
+
+        var package = JSON.parse(data);
+
+        var nameParts = package.name.split('-');
+        var filepath = "org.opent2t.onboarding." + nameParts[nameParts.length - 1];
+
+        package.main = filepath + "/js/thingOnboarding.js";
+        package.files = [
+            filepath + "/*",
+            filepath + "/js/*"
+        ];
+
+        var contents = JSON.stringify(package, null, 2);
+        fs.writeFile(outfile, contents, 'utf8', (err) => {
+            if (err) {
+                return console.lof(err);
+            }
+            console.log(contents);
+        });
     });
 }
