@@ -54,15 +54,15 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     $scope.selectHub = function (hub) {
         $scope.selectedPlatform = undefined;
         $scope.loadingMessage = 'Loading Hub';
-        $scope.selectedHub = hub;
 
-        if ($scope.selectedHub !== undefined && $scope.hubData[$scope.selectedHub.translatorPackageName] === undefined) {
+        if (hub !== undefined && $scope.hubData[hub.translatorPackageName] === undefined) {
             $scope.loading = true;
-            getHubData().then(platforms => {
+            getHubData(hub).then(platforms => {
+                $scope.selectedHub = hub;
                 $scope.selectPlatform(platforms[0]);
             }).catch(error => {
+                $scope.loading = false;
                 logError(error);
-                $scope.$apply();
             });
         }
         else {
@@ -74,7 +74,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         let currentPlatformId = $scope.selectedPlatform === undefined ? undefined : $scope.selectedPlatform.info.opent2t.controlId;
         $scope.loadingMessage = 'Refreshing Hub Data';
         $scope.loading = true;
-        getHubData().then(platforms => {
+        getHubData($scope.selectedHub).then(platforms => {
             if(currentPlatformId) {
                 for(let i = 0;i < platforms.length;i++) {
                     if(platforms[i].info.opent2t.controlId === currentPlatformId) {
@@ -84,8 +84,8 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
                 }
             }
         }).catch(error => {
+            $scope.loading = false;
             logError(error);
-            $scope.$apply();
         });
     }
 
@@ -294,10 +294,10 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         return deferred.promise;
     }
 
-    function getHubData() {
+    function getHubData(hub) {
         let deferred = $q.defer();
 
-        $scope.remoteApp.loadDevices($scope.selectedHub.translatorPackageName).then(info => {
+        $scope.remoteApp.loadDevices(hub.translatorPackageName).then(info => {
             let platforms = [];
             for (var i = 0; i < info.platforms.length; i++) {
                 let platform = info.platforms[i];
@@ -313,7 +313,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
                 platforms.push({ info: platform, metadata: getDeviceMetadata(platform) });
             }
 
-            $scope.hubData[$scope.selectedHub.translatorPackageName] = platforms;
+            $scope.hubData[hub.translatorPackageName] = platforms;
             $scope.loading = false;
             deferred.resolve(platforms);
         }).catch(error => {

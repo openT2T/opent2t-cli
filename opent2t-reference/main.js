@@ -6,7 +6,7 @@ var fs = require('fs');
 require('electron-reload')(__dirname);
 var Opent2tHelper = require("./Opent2tHelper");
 var opent2tHelper = new Opent2tHelper();
-var helpers = require('./helpers');
+var helpers = require('../helpers');
 
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -33,9 +33,6 @@ app.on('ready', function () {
 
     // and load the index.html of the app.
     mainWindow.loadURL('file://' + __dirname + '/index.html');
-
-    // Open the devtools.
-    //mainWindow.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
