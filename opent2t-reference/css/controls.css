@@ -1,0 +1,503 @@
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+small {
+    font-size:65%;
+}
+
+.ct-header,
+.ct-header-2 {
+    font-family: Segoe UI;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background-color: #8b8b8b;
+    color: white;
+    padding:5px;
+    height: 50px;
+    line-height: 40px;
+    font-size: x-large;
+}
+.ct-header-3 {
+    font-family: Segoe UI;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background-color: #dcdcdc;
+    color: #424242;
+    padding:5px;
+    font-size: larger;
+}
+
+.ct-main-container {
+    display: flex;
+    width:100%;
+}
+
+.ct-left-panel {
+    width:15%;
+    min-width:200px;
+    padding:5px;
+}
+
+.ct-hub-list {
+    width:100%;
+    border-style:solid;
+    border-width:1px;
+    border-color:lightgray;
+    padding:5px;
+    min-height:300px;
+}
+
+.ct-hub-list-item,
+.ct-hub-list-item.active {
+    padding:5px;
+    background-color:transparent;
+}
+
+.ct-hub-list-item:hover {
+    background-color:lightgray;
+}
+
+.ct-hub-list-item-selected {
+    background-color:darkgray;
+    color:white;
+}
+
+.ct-hub-detail {
+    width:80%;
+    min-width:300px;
+    margin:5px;
+    border-style:solid;
+    border-width:1px;
+    border-color:lightgray;
+}
+
+.ct-hub-detail-header {
+    font-size: large;
+}
+
+.ct-thing-container {
+    display: flex;
+    flex-wrap: wrap;
+    padding:2px;
+    flex:2;
+    align-content: flex-start;
+    overflow-y: auto;
+    background-color: #f5f5f5;
+}
+
+.panel-contents-container
+{
+    overflow: auto;
+}
+
+.ct-details-container
+{
+    display:flex;
+    flex-direction: column;
+    margin-right:5px;
+    flex:1;
+    margin-left: 10px;
+}
+
+.ct-thing {
+    background-color: #e2e2e2;
+    padding:5px;
+    margin:2px;
+    display:flex;
+    flex-direction: column;
+    width:175px;
+    height:175px;
+}
+
+.ct-thing:hover
+{
+    /*background-color: #e2e2e2;*/
+}
+
+.ct-thing.ct-large-thing
+{
+    width:352px;
+    height:352px;
+}
+
+.ct-thing.ct-medium-thing
+{
+    width:352px;
+}
+
+.currentPlatform
+{
+    background-color: #f5f5f5;
+    border-style:solid;
+    border-width:2px;
+    border-color:darkgray;
+}
+
+.ct-thing-icon {
+    font-size:20px;
+    line-height: inherit;
+}
+
+.actionable
+{
+    cursor: pointer;
+}
+
+.ct-thing-name {
+    height:40px;
+    display:flex;
+}
+
+.ct-action {
+    text-align:center;
+    vertical-align:middle;
+    min-height:120px;
+    min-width:150px;
+    max-width:150px;
+    max-height:120px;
+    margin:auto;
+    padding:5px;
+    display:flex;
+    flex-direction:column;
+}
+
+.ct-value-select
+{
+    height:22px;
+}
+
+.ct-temp-controls {
+    display: flex;
+}
+
+.ct-text-input
+{
+    overflow: hidden;
+    margin-right:5px;
+    height:22px;
+}
+
+.ct-color-display {
+    width:15px;
+    height:15px;
+    display:inline-block;
+}
+
+.ct-switch > label {
+    padding: 2px 12px;
+}
+
+.ct-admin-actions {
+    min-width:100px;
+    width:100%;
+    align-self:flex-end;
+    text-align:right;
+    flex: 1 1 auto;
+    display:flex;
+    flex-direction:row-reverse;
+    align-items:flex-end; 
+}
+
+.ct-admin-action {
+    margin: 2px;
+    cursor: pointer;
+}
+
+.ct-admin-actions,
+.ct-color-text
+{
+    visibility: visible;
+}
+
+.ct-name-container
+{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+    font-weight: 500;
+}
+
+.ct-button
+{
+    padding-top:0px;
+    padding-bottom: 0px;
+}
+
+.ct-slider
+{
+    background-color: white;
+    border-color: rgb(197, 197, 197);
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 1px;
+    box-sizing: border-box;
+    color: rgb(51, 51, 51);
+    font-size: 1em;
+    height: 0.8em;
+    position: relative;
+    text-align: left;
+    flex:1;
+    visibility: visible;
+    margin-top:auto;
+    margin-bottom: auto;
+}
+
+.dim-percentage
+{
+    display: flex;
+}
+
+.invoke-container
+{
+    display: flex;
+}
+
+.invoke-input
+{
+    flex:1;
+}
+
+.input-row label
+{
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.ct-resources
+{
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-right:5px;
+    padding-left:5px;
+}
+
+.ct-resources.ct-x-large-resources
+{
+    padding-right:0px;
+    padding-left:0px;
+}
+
+.ct-value-container {
+    height:22px;
+}
+
+.dim-percentage .ct-value-text
+{
+    width:42px;
+}
+
+.ct-resource-container
+{
+    background-color: white;
+    margin-bottom: 2px;
+    padding:2px 5px 5px 5px;
+    width: 160px;
+    display: inline-block;
+}
+
+.ui-slider-handle
+{
+    background-color: rgb(246, 246, 246);
+    border-color: rgb(197, 197, 197);
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 1px;
+    box-sizing: border-box;
+    color: rgb(69, 69, 69);
+    font-size: 1em;
+    font-weight: 400;
+    height: 1.2em;
+    left: 0px;
+    margin-left: -0.6em;
+    position: absolute;
+    text-align: left;
+    top: -0.3em;
+    width: 1.2em;
+    z-index: 2;
+}
+
+.ct-thing:hover .ct-color-text,
+.ct-thing:hover .ct-admin-actions,
+.ct-thing:hover .ct-slider {
+    visibility: visible;
+}
+
+.ct-switch {
+    margin-left: auto;
+    margin-right: auto;
+    padding:5px;
+}
+
+.ct-slider-container {
+    margin:5px;
+    min-width:100px;
+}
+
+.progress {
+    display:inline-block;
+}
+
+
+
+
+/*! jQuery UI - v1.10.3 - 2013-10-08
+* http://jqueryui.com
+* Includes: jquery.ui.core.css, jquery.ui.slider.css
+* Copyright 2013 jQuery Foundation and other contributors; Licensed MIT */
+
+/* Layout helpers
+----------------------------------*/
+.ui-helper-hidden {
+	display: none;
+}
+.ui-helper-hidden-accessible {
+	border: 0;
+	clip: rect(0 0 0 0);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+}
+.ui-helper-reset {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	line-height: 1.3;
+	text-decoration: none;
+	font-size: 100%;
+	list-style: none;
+}
+.ui-helper-clearfix:before,
+.ui-helper-clearfix:after {
+	content: "";
+	display: table;
+	border-collapse: collapse;
+}
+.ui-helper-clearfix:after {
+	clear: both;
+}
+.ui-helper-clearfix {
+	min-height: 0; /* support: IE7 */
+}
+.ui-helper-zfix {
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	position: absolute;
+	opacity: 0;
+	filter:Alpha(Opacity=0);
+}
+
+.ui-front {
+	z-index: 100;
+}
+
+
+/* Interaction Cues
+----------------------------------*/
+.ui-state-disabled {
+	cursor: default !important;
+}
+
+
+/* Icons
+----------------------------------*/
+
+/* states and images */
+.ui-icon {
+	display: block;
+	text-indent: -99999px;
+	overflow: hidden;
+	background-repeat: no-repeat;
+}
+
+
+/* Misc visuals
+----------------------------------*/
+
+/* Overlays */
+.ui-widget-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+.ui-slider {
+	position: relative;
+	text-align: left;
+}
+.ui-slider .ui-slider-handle {
+	position: absolute;
+	z-index: 2;
+	width: 1.2em;
+	height: 1.2em;
+	cursor: default;
+}
+.ui-slider .ui-slider-range {
+	position: absolute;
+	z-index: 1;
+	font-size: .7em;
+	display: block;
+	border: 0;
+	background-position: 0 0;
+}
+
+/* For IE8 - See #6727 */
+.ui-slider.ui-state-disabled .ui-slider-handle,
+.ui-slider.ui-state-disabled .ui-slider-range {
+	filter: inherit;
+}
+
+.ui-slider-horizontal {
+	height: .8em;
+}
+.ui-slider-horizontal .ui-slider-handle {
+	top: -.3em;
+	margin-left: -.6em;
+}
+.ui-slider-horizontal .ui-slider-range {
+	top: 0;
+	height: 100%;
+}
+.ui-slider-horizontal .ui-slider-range-min {
+	left: 0;
+}
+.ui-slider-horizontal .ui-slider-range-max {
+	right: 0;
+}
+
+.ui-slider-vertical {
+	width: .8em;
+	height: 100px;
+}
+.ui-slider-vertical .ui-slider-handle {
+	left: -.3em;
+	margin-left: 0;
+	margin-bottom: -.6em;
+}
+.ui-slider-vertical .ui-slider-range {
+	left: 0;
+	width: 100%;
+}
+.ui-slider-vertical .ui-slider-range-min {
+	bottom: 0;
+}
+.ui-slider-vertical .ui-slider-range-max {
+	top: 0;
+}
