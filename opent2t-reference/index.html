@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html ng-app="mainModule" ng-controller="MainCtrl">
+
+    <head>
+        <title>{{ config.appTitle }}</title>
+        <script type="text/javascript">
+            window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.min.js');
+        </script>
+        <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css">
+        <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
+        <script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.js"></script>
+        <script type="text/javascript" src="bower_components/jquery-ui/ui/widgets/slider.js"></script>
+        <script type="text/javascript" src="bower_components/angular/angular.js"></script>
+        <script type="text/javascript" src="bower_components/angular-ui-slider/src/slider.js"></script>
+        <script src="app.js"></script>
+        <link href="css/app.css" rel="stylesheet" type="text/css" />
+        <link href="css/controls.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/6.0.0/rzslider.min.css">
+        <script src="config.js"></script>
+        <script>
+            shell = require('electron').shell;
+            remote = require('electron').remote;
+            mainModule.value("remote", remote);
+            mainModule.value("config", config);
+        </script>
+    </head>
+
+    <body>
+        <div class="app-grid">
+            <div class="otr-main-app-grid" ng-show="!loading">
+                <div class="otr-top-panel">
+                    <div class="otr-panel-header">
+                        <div ng-show="!onboarding" style="display:inline-block;">
+                            <div class="dropdown" style="display:inline-block" ng-if="configuredHubs.length > 0">
+                                <div class="hub-dropdown" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    {{selectedHub.translator || 'Select Hub'}}
+                                    <i class="fa ct-thing-icon fa-caret-down actionable"></i>
+                                </div>
+                                <ul class="dropdown-menu hub-menu" aria-labelledby="dropdownMenu1">
+                                    <li class="actionable hub-menu-item" ng-repeat="configuredHub in configuredHubs" ng-click="selectHub(configuredHub)">{{configuredHub.translator}}</li>
+                                </ul>
+                            </div>
+                            <span class="actionable header-icon" ng-click="addHub()">
+                                <span class="fa fa-plus icon-button" title="Add Hub"></span>
+                                <span ng-if="configuredHubs.length === 0">Add a Hub</span>
+                            </span>
+                            <span class="actionable header-icon" ng-click="refreshHub()" ng-if="selectedHub != undefined">
+                                <span class="fa fa-refresh icon-button" title="Refresh Hub Info"></span>
+                                <span ng-if="configuredHubs.length === 0">Add a Hub</span>
+                            </span>
+                        </div>
+                        <span ng-show="onboarding">Onboarding</span>
+                        <span>
+                            <i class="fa fa-exclamation ct-thing-icon pull-right error-marker" ng-class="{'invisible':state.outputType !== 'error'}"></i>
+                        </span>
+                        <span class="pull-right glyphicon glyphicon-modal-window icon-button" ng-class="{'icon-off':!state.showOutput}" title="{{(state.showOutput ? 'Hide' : 'Show') + ' Output'}}" ng-click="state.showOutput = !state.showOutput">
+                        </span>
+                    </div>
+                </div>
+                <div class="otr-grid-cell-fit otr-main-wrapper" ng-show="!onboarding">
+
+                    <div class="ct-thing-container" ng-show="selectedHub != undefined">
+                        <div ng-repeat="platform in hubData[selectedHub.translatorPackageName] | orderBy: 'metadata.sizeClass'" class="ct-thing" ng-class="[platform === selectedPlatform && 'currentPlatform', platform.metadata.sizeClass]">
+                            <div class="ct-thing-name actionable" ng-click="selectPlatform(platform)">
+                                <div style="flex:1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <i class="fa ct-thing-icon" ng-class="platform.metadata.iconClass" aria-hidden="true"></i> {{platform.info.n}}
+                                </div>
+                            </div>
+                            <div class="ct-resources" ng-class="{'ct-x-large-resources':platform.info.entities[0].resources.length > 10}">
+                                <div class="ct-resource-container" ng-repeat="resource in platform.info.entities[0].resources">
+                                    <div class="ct-name-container" title="{{resource.id}}">{{resource.id}}</div>
+                                    <div class="ct-value-container">
+                                        <div ng-if="resource.rt[0] === 'oic.r.switch.binary'">
+                                            <div ng-if="resource.if.indexOf('oic.if.a') !== -1" class="icon-button" title="{{resource.value ? 'Turn off' : 'Turn on'}}" ng-click="setBinarySwitchValue(platform, resource, !resource.value);">
+                                                <i class="fa resource-button" ng-class="resource.value ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
+                                            </div>
+                                            <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.value}}</span>
+                                        </div>
+                                        <div class="dim-percentage" ng-if="resource.rt[0] === 'oic.r.light.dimming'">
+                                            <div class="ct-value-text">{{resource.dimmingSetting}}%</div>
+                                            <div ui-slider class="ct-slider" ng-if="resource.if.indexOf('oic.if.a') !== -1" min="{{resource.range[0]}}" max="{{resource.range[1]}}" ng-model="resource.dimmingSetting" ng-mouseup="setDimmingValue(platform, resource, resource.dimmingSetting)"></div>
+                                        </div>
+                                        <div ng-if="resource.rt[0] === 'oic.r.temperature'">
+                                            <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
+                                                <input class="ct-text-input" ng-disabled="resource.if.indexOf('oic.if.a') === -1" type="number" name="input" ng-model="resource.temperature">
+                                                <div class="icon-button" title="Set" ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-click="setTemperatureValue(platform, resource, resource.temperature);">
+                                                    <i class="fa fa-arrow-circle-right resource-button"></i>
+                                                </div>
+                                            </div>
+                                            <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.temperature}}</span>
+                                        </div>
+                                        <div ng-if="resource.rt[0] === 'oic.r.humidity'">
+                                            <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
+                                                <input class="ct-text-input" ng-disabled="resource.if.indexOf('oic.if.a') === -1" type="number" name="input" ng-model="resource.humidity">
+                                                <div class="icon-button" title="Set" ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-click="setHumidityValue(platform, resource, resource.humidity);">
+                                                    <i class="fa fa-arrow-circle-right resource-button"></i>
+                                                </div>
+                                            </div>
+                                            <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.humidity}}</span>
+                                        </div>
+                                        <div ng-if="resource.rt[0] === 'oic.r.mode'">
+                                            <select ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-disabled="resource.if.indexOf('oic.if.a') === -1" class="ct-value-select" ng-model="resource.currentMode" ng-change="setModeValue(platform, resource, resource.currentMode)">
+                                                <option ng-repeat="option in resource.supportedModes" value="{{option}}">{{option}}</option>
+                                            </select>
+                                            <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.currentMode}}</span>
+                                        </div>
+                                        <span ng-if="resource.rt[0] === 'oic.r.sensor'">{{resource.value}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ct-details-container" ng-show="selectedPlatform != undefined">
+                        <div class="otr-panel-header">
+                            Device Details
+                            <i class="fa fa-times pull-right icon-button" ng-click="selectPlatform(undefined)"></i>
+                        </div>
+                        <div class="panel-contents-container" style="flex:1;">
+                            <div class="details-section">
+                                <h2>{{selectedPlatform.info.n}}</h2>
+                                <ul class="advanced-info-list">
+                                    <li>
+                                        <label>Control Id: </label>
+                                        <span>{{selectedPlatform.info.opent2t.controlId}}</span>
+                                    </li>
+                                    <li>
+                                        <label>Device Id: </label>
+                                        <span>{{selectedPlatform.info.entities[0].di}}</span>
+                                    </li>
+                                    <li>
+                                        <label>Type: </label>
+                                        <span>{{selectedPlatform.info.entities[0].rt[0]}}</span>
+                                    </li>
+                                    <li>
+                                        <label>Schema: </label>
+                                        <span>{{selectedPlatform.info.opent2t.schema}}</span>
+                                    </li>
+                                    <li>
+                                        <label>Translator: </label>
+                                        <span>{{selectedPlatform.info.opent2t.translator}}</span>
+                                    </li>
+                                </ul>
+                                <div class="icon-button resource-controls" title="Get All Info" ng-click="getDeviceInfo(selectedPlatform)">
+                                    <i class="fa fa-info-circle"></i>
+                                </div>
+                            </div>
+                            <div class="details-section">
+                                <h3>Invoke Method</h3>
+                                <div class="invoke-container">
+                                    <div class="invoke-input">
+                                        <div class="input-row">
+                                            <label>Method:</label>
+                                            <input class="ct-text-input" type="text" ng-model="invokeMethodName">
+                                        </div>
+                                        <div class="input-row">
+                                            <label title="Stringified parameter array">Params:</label>
+                                            <input class="ct-text-input" type="text" ng-model="invokeMethodParams">
+                                        </div>
+                                    </div>
+                                    <div class="icon-button resource-controls" title="Invoke Method" ng-click="invokeDeviceMethod(selectedPlatform, invokeMethodName, invokeMethodParams)">
+                                        <i class="fa fa-arrow-circle-right"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="details-section">
+                                <h3>Resources</h3>
+                                <ul>
+                                    <li class="resource-info-item" ng-repeat="resource in selectedPlatform.info.entities[0].resources">
+                                        <div class="resource-details">
+                                            <div class="resource-name">{{resource.id}}</div>
+                                            <div>{{resource.rt[0]}}</div>
+                                        </div>
+                                        <div class="resource-controls actionable" title="Get Info" ng-click="getDeviceProperty(selectedPlatform, resource.id)">
+                                            <i class="fa fa-info-circle"></i>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="otr-grid-cell-fit" ng-show="onboarding">
+                    <div class="onboarding-container">
+                        <div class="onboarding-question">
+                            <span class="onboarding-name">Hub Name
+                                <span class="onboarding-description">(e.g. Contoso Hub)</span>
+                            </span>
+                            <input class="onboarding-text-input" type="text" ng-model="hubName">
+                        </div>
+                        <div class="onboarding-question">
+                            <span class="onboarding-name">Hub Package
+                                <span class="onboarding-description">(e.g. opent2t-translator-com-contoso-hub)</span>
+                            </span>
+                            <input class="onboarding-text-input" type="text" ng-model="hubPackage" ng-disabled="onboardingPhase !== 1">
+                        </div>
+                        <div ng-if="onboardingPhase === 2">
+                            <div class="onboarding-question" ng-repeat="question in onboardingQuestions">
+                                <span class="onboarding-name">{{question.question}}</span>
+                                <input class="onboarding-text-input" type="{{question.type === 'password' ? 'password' : 'text'}}" ng-model="question.answer">
+                            </div>
+                        </div>
+                        <div class="onboarding-controls">
+                            <label ng-disabled="!hubName || !hubPackage" class="btn btn-default" ng-if="onboardingPhase === 1" ng-click="startOnboarding(hubPackage)">
+                                <span>Start Onboarding</span>
+                            </label>
+                            <label class="btn btn-default" ng-if="onboardingPhase === 2" ng-click="completeOnboarding()">
+                                <span>Complete Onboarding</span>
+                            </label>
+                            <label class="btn btn-default" ng-click="cancelOnboarding()">
+                                <span>Cancel</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="otr-bottom-panel" ng-if="state.showOutput">
+                    <div class="otr-panel-header">
+                        Output
+                        <i class="fa fa-times pull-right icon-button" ng-click="state.showOutput = false"></i>
+                    </div>
+                    <div class="otr-output-container">
+                        <textarea readonly class="otr-output-area" ng-model="state.currentOutput" ng-class="state.outputType === 'error' ? 'otr-output-error' : 'otr-output-info'"></textarea>
+                    </div>
+                </div>
+
+            </div>
+            <div class="loading-message" ng-show="loading">
+                <div>{{loadingMessage}}</div>
+                <div>
+                    <i class="fa fa-refresh fa-spin"></i>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var remote = require('electron').remote;
+        </script>
+    </body>
+</html>

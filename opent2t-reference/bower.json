@@ -1,0 +1,21 @@
+{
+  "name": "opent2t-reference",
+  "description": "opent2t reference app",
+  "main": "main.js",
+  "authors": [
+    "Chuck Ferring <chuckfer@microsoft.com>"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-ui-slider": "^0.4.0"
+  }
+}
