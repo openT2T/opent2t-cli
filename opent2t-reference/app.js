@@ -200,7 +200,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     $scope.getDeviceInfo = function (device) {
         clearLog();
         $scope.state.showOutput = true;
-        logInfo(JSON.stringify(device.info, null, 2));
+        logInfo(angular.toJson(device.info, 2));
     }
 
     $scope.getDeviceProperty = function (device, property) {
