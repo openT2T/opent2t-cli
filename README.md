@@ -70,7 +70,19 @@ Let's break this call down:
 * -h is the hub you're communicating through
 * -t is the device type you want to talk to
 * -i is the id of the specific device you want to talk to
-* -g is the get RAML method call the cli makes 
+* -g is the get RAML method call the cli makes
+
+## Run the CLI in interactive mode
+
+```bash
+node index.js -m
+```
+
+You can run the CLI in interactive mode for a more guided experience.  In interactive mode you will be given menu prompts to perform common tasks such as:
+* Onboarding a hub
+* Selecting hubs and devices
+* Viewing device information
+* Modifying device state.
 
 ## Code of Conduct
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
