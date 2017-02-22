@@ -94,7 +94,8 @@ small {
 
 .panel-contents-container
 {
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .ct-details-container
@@ -102,7 +103,8 @@ small {
     display:flex;
     flex-direction: column;
     margin-right:5px;
-    flex:1;
+    min-width: 100px;
+    width:300px;
     margin-left: 10px;
 }
 

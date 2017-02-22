@@ -1,4 +1,4 @@
-var mainModule = angular.module('mainModule', ['ui.slider']);
+var mainModule = angular.module('mainModule', ['ui.slider', 'angularResizable']);
 
 mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', function ($scope, $http, $q, remote, config) {
 
