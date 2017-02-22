@@ -194,10 +194,10 @@
                             <input class="onboarding-text-input" type="text" ng-model="hubName">
                         </div>
                         <div class="onboarding-question">
-                            <span class="onboarding-name">Hub Package
-                                <span class="onboarding-description">(e.g. opent2t-translator-com-contoso-hub)</span>
-                            </span>
-                            <input class="onboarding-text-input" type="text" ng-model="hubPackage" ng-disabled="onboardingPhase !== 1">
+                            <span class="onboarding-name">Hub Package</span>
+                            <select ng-model="hubPackage" ng-disabled="onboardingPhase !== 1">
+                                <option ng-repeat="option in knownHubs" value="{{option}}">{{option}}</option>
+                            </select>
                         </div>
                         <div ng-if="onboardingPhase === 2">
                             <div class="onboarding-question" ng-repeat="question in onboardingQuestions">

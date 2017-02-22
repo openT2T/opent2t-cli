@@ -90,6 +90,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     }
 
     $scope.addHub = function () {
+        $scope.knownHubs = $scope.remoteApp.getKnownHubs();
         $scope.hubName = undefined;
         $scope.hubPackage = undefined;
         $scope.onboardingPhase = 1;

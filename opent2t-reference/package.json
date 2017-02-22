@@ -14,6 +14,7 @@
     "colors": "^1.1.2",
     "express": "^4.14.1",
     "font-awesome": "^4.7.0",
+    "glob": "^7.1.1",
     "jquery": "^3.1.1",
     "open": "0.0.5",
     "opent2t": "^1.0.2",
