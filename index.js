@@ -34,6 +34,9 @@ program
     .option('-g --get [RAML property name]', 'Property name to GET for -t')
     .option('-s --set [RAML property name]', 'Property name to SET for -t')
     .option('-v --value [value]', 'Stringified JSON value to pass in')
+    .option('-n --subscribe [url]', 'Subscribe a URL to notifications from a device')
+    .option('-u --unsubscribe [url]', 'Unsubscribe a URL to notifications from a device')
+    .option('-x --translate', 'Translate a provider formated blob into OpenT2T format')
     .option('-m --menu', 'Launch interactive menu')
     .parse(process.argv);
 
@@ -85,7 +88,6 @@ else if (program.translator && program.hub) {
             helpers.readFile(fileName, "Please complete hub -h before calling -t").then(data => {
                 var deviceInfo = JSON.parse(data);
                 var dInfo = { 'deviceInfo': deviceInfo, 'hub': hub };
-                
                 if (program.get) {
                     
                     // If a device/entity id was provided, then pass it, otherwise pass expand=true
@@ -114,6 +116,20 @@ else if (program.translator && program.hub) {
                     }).catch(error => {
                         helpers.logError(error);
                     });
+                } else if (program.subscribe) {
+                    translatorCli.subscribe(program.translator, dInfo, program.subscribe).then(info => {
+                        console.log("test");
+                        helpers.logObject(info)
+                    }).catch(error => {
+                        console.log("eoops");
+                        helpers.logError(error);
+                    });
+                } else if (program.unsubscribe) {
+                    translatorCli.unsubscribe(program.translator, dInfo, program.unsubscribe).then(info => {
+                        helpers.logObject(info)
+                    }).catch(error => {
+                        helpers.logError(error);
+                    });
                 }
             });
         });
@@ -128,12 +144,22 @@ else if (program.hub) {
     var fileName = helpers.createOnboardingFileName(program.hub);
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => { 
         var deviceInfo = JSON.parse(data);
-        translatorCli.getProperty(program.hub, deviceInfo, 'getPlatforms').then(info => {
-            helpers.logObject(info);
-            helpers.writeArrayToFile(info.platforms, "_device_", "controlId");
-        }).catch(error => {
-            helpers.logError(error);
-        });
+
+        if (program.translate) {
+            translatorCli.getProperty(program.hub, deviceInfo, 'getPlatforms', [true, program.value]).then(info => {
+                helpers.logObject(info);
+            }).catch(error => {
+                helpers.logError(error);
+            });
+            
+        } else {
+            translatorCli.getProperty(program.hub, deviceInfo, 'getPlatforms').then(info => {
+                helpers.logObject(info);
+                helpers.writeArrayToFile(info.platforms, "_device_", "controlId");
+            }).catch(error => {
+                helpers.logError(error);
+            });
+        }
     }).catch(error => {
         helpers.logError(error);
     });
