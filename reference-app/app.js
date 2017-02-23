@@ -10,7 +10,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     $scope.selectedHub = undefined;
     $scope.selectedPlatform = undefined;
     $scope.hubData = {};
-    $scope.state = { currentOutput: '', showOutput: true };
+    $scope.state = { currentOutput: '', showOutput: true, ready: false, busy: false };
     $scope.loadingMessage = '';
 
     // by default ensure loading screen shows on app launch
@@ -18,25 +18,18 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     $scope.onboarding = false;
 
     $scope.loadData = function () {
+        $q.all([$scope.loadOnboardingInfo()]);
 
-        // load onboarding info from supportedHubs
-        var promises = [];
-        for (var i = 0; i < $scope.config.supportedHubs.length; i++) {
-            promises.push($scope.loadOnboardingInfo($scope.config.supportedHubs[i]));
-        }
-        $q.all(promises);
-
-        // load already configured hubs
         $scope.remoteApp.loadConfigs().then((files) => {
             $scope.configuredHubs = files;
+            $scope.loading = false;
+            $scope.state.ready = true;
         });
-
-        $scope.loading = false;
     }
 
-    $scope.loadOnboardingInfo = function (translatorName) {
+    $scope.loadOnboardingInfo = function () {
         var LocalPackageSourceClass = require('opent2t/package/LocalPackageSource').LocalPackageSource;
-        var localPackageSource = new LocalPackageSourceClass("./node_modules/" + translatorName);
+        var localPackageSource = new LocalPackageSourceClass("./node_modules");
 
         return localPackageSource.getAllPackageInfoAsync().then((packages) => {
 
@@ -45,7 +38,6 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
             if (p.translators.length > 0) {
 
                 var tinfo = p.translators[0];
-                $scope.onboardingMap[translatorName] = tinfo.onboardingFlow;
                 return tinfo.onboardingFlow;
             }
         });
@@ -75,9 +67,9 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         $scope.loadingMessage = 'Refreshing Hub Data';
         $scope.loading = true;
         getHubData($scope.selectedHub).then(platforms => {
-            if(currentPlatformId) {
-                for(let i = 0;i < platforms.length;i++) {
-                    if(platforms[i].info.opent2t.controlId === currentPlatformId) {
+            if (currentPlatformId) {
+                for (let i = 0; i < platforms.length; i++) {
+                    if (platforms[i].info.opent2t.controlId === currentPlatformId) {
                         $scope.selectPlatform(platforms[i]);
                         break;
                     }
@@ -205,12 +197,15 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     }
 
     $scope.getDeviceProperty = function (device, property) {
+        $scope.state.busy = true;
         clearLog();
         $scope.state.showOutput = true;
         $scope.remoteApp.getProperty($scope.selectedHub.translatorPackageName, device.info, device.info.entities[0].di, property).then(info => {
             logInfo(JSON.stringify(info, null, 2));
+            $scope.state.busy = false;
             $scope.$apply();
         }).catch(error => {
+            $scope.state.busy = false;
             logError(error);
             $scope.$apply();
         });
@@ -259,15 +254,19 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
 
     $scope.invokeDeviceMethod = function (device, methodName, params) {
         clearLog();
+        $scope.state.busy = true;
         $scope.remoteApp.invokeDeviceMethod($scope.selectedHub.translatorPackageName, device.info, methodName, params).then(info => {
             logInfo(JSON.stringify(info, null, 2));
             $scope.remoteApp.getDeviceInfo($scope.selectedHub.translatorPackageName, device.info).then(deviceInfo => {
                 device.info = deviceInfo;
+                $scope.state.busy = false;
                 $scope.$apply();
             }).catch(error => {
+                $scope.state.busy = false;
                 deferred.reject(error);
             });
         }).catch(error => {
+            $scope.state.busy = false;
             logError(error);
             $scope.$apply();
         });
@@ -277,15 +276,19 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         clearLog();
 
         let deferred = $q.defer();
+        $scope.state.busy = true;
 
         $scope.remoteApp.setProperty($scope.selectedHub.translatorPackageName, device.info, device.info.entities[0].di, property.id, payload).then(info => {
             logInfo(JSON.stringify(info, null, 2));
             deferred.resolve(info);
+            $scope.state.busy = false;
         }).catch(error => {
             $scope.remoteApp.getDeviceInfo($scope.selectedHub.translatorPackageName, device.info).then(deviceInfo => {
                 device.info = deviceInfo;
+                $scope.state.busy = false;
                 $scope.$apply();
             }).catch(error => {
+                $scope.state.busy = false;
                 logError(error);
                 $scope.$apply();
             });

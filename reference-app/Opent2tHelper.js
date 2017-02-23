@@ -72,7 +72,7 @@ class Opent2tHelper {
         var deferred = q.defer();
 
         var LocalPackageSourceClass = require('opent2t/package/LocalPackageSource').LocalPackageSource;
-        var localPackageSource = new LocalPackageSourceClass("./node_modules/" + translatorName);
+        var localPackageSource = new LocalPackageSourceClass(translatorName);
 
         localPackageSource.getAllPackageInfoAsync().then((packages) => {
             // default use the first package

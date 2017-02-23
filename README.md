@@ -17,10 +17,16 @@ Get your dev environment set up (PC or Mac):
 * [Install Node](https://nodejs.org/en/download/)
 * Choose your favorite IDE, e.g. [Visual Studio Code](https://code.visualstudio.com/).
 
-We recommend that you install the CLI globally.
+Clone the CLI repo
 
 ```bash
-$ npm install –g opent2t-cli
+$ git clone https://github.com/openT2T/opent2t-cli.git
+```
+
+Install the CLI's dependencies
+
+```bash
+$ npm install
 ```
 
 ## Run a Translator Locally
@@ -83,6 +89,27 @@ You can run the CLI in interactive mode for a more guided experience.  In intera
 * Selecting hubs and devices
 * Viewing device information
 * Modifying device state.
+
+## Run the graphical reference application
+
+Install electron globally
+
+```bash
+$ npm install –g electron
+```
+
+Launch the reference application
+
+```bash
+electron .\reference-app\main.js
+```
+
+### From here you can:
+1. Onboard an installed hub.
+2. Select a hub that has been onboarded.
+3. Interact with the hub devices.
+4. Get information about the state of the hub and devices.
+
 
 ## Code of Conduct
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.

@@ -9,6 +9,14 @@ body {
     color:#232323;
 }
 
+body.body {
+    visibility: hidden;
+}
+
+body.body.ready {
+    visibility: visible;
+}
+
 ul
 {
     list-style: none;
@@ -139,7 +147,7 @@ ul
 
 .onboarding-name
 {
-    width: 420px;
+    width: 250px;
     font-weight:500;
 }
 
@@ -305,6 +313,12 @@ ul
 .resource-button
 {
     font-size: 20px;
+}
+
+.busy .icon-button
+{
+    color:#999999;
+    cursor:not-allowed;
 }
 
 .icon-button.icon-off

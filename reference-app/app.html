@@ -4,19 +4,19 @@
     <head>
         <title>{{ config.appTitle }}</title>
         <script type="text/javascript">
-            window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.min.js');
+            window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery.min.js');
         </script>
-        <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
-        <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css">
-        <link rel="stylesheet" href="node_modules/angular-resizable/angular-resizable.min.css">
-        <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="../node_modules/angular-resizable/angular-resizable.min.css">
+        <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
         <script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.js"></script>
         <script type="text/javascript" src="bower_components/jquery-ui/ui/widgets/slider.js"></script>
         <script type="text/javascript" src="bower_components/angular/angular.js"></script>
         <script type="text/javascript" src="bower_components/angular-ui-slider/src/slider.js"></script>
-        <script src="node_modules/angular-resizable/angular-resizable.min.js"></script>
+        <script src="../node_modules/angular-resizable/angular-resizable.min.js"></script>
         <script src="app.js"></script>
         <link href="css/app.css" rel="stylesheet" type="text/css" />
         <link href="css/controls.css" rel="stylesheet" type="text/css" />
@@ -30,7 +30,7 @@
         </script>
     </head>
 
-    <body>
+    <body class="body" ng-class="{'ready':state.ready === true}">
         <div class="app-grid">
             <div class="otr-main-app-grid" ng-show="!loading">
                 <div class="otr-top-panel">
@@ -62,11 +62,11 @@
                         </span>
                     </div>
                 </div>
-                <div class="otr-grid-cell-fit otr-main-wrapper" ng-show="!onboarding">
+                <div class="otr-grid-cell-fit otr-main-wrapper" ng-class="{'busy':state.busy}" ng-show="!onboarding">
 
                     <div class="ct-thing-container" ng-show="selectedHub != undefined">
                         <div ng-repeat="platform in hubData[selectedHub.translatorPackageName] | orderBy: 'metadata.sizeClass'" class="ct-thing" ng-class="[platform === selectedPlatform && 'currentPlatform', platform.metadata.sizeClass]">
-                            <div class="ct-thing-name actionable" ng-click="selectPlatform(platform)">
+                            <div class="ct-thing-name actionable" ng-click="state.busy || selectPlatform(platform)">
                                 <div style="flex:1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                     <i class="fa ct-thing-icon" ng-class="platform.metadata.iconClass" aria-hidden="true"></i> {{platform.info.n}}
                                 </div>
@@ -76,19 +76,19 @@
                                     <div class="ct-name-container" title="{{resource.id}}">{{resource.id}}</div>
                                     <div class="ct-value-container">
                                         <div ng-if="resource.rt[0] === 'oic.r.switch.binary'">
-                                            <div ng-if="resource.if.indexOf('oic.if.a') !== -1" class="icon-button" title="{{resource.value ? 'Turn off' : 'Turn on'}}" ng-click="setBinarySwitchValue(platform, resource, !resource.value);">
+                                            <div ng-if="resource.if.indexOf('oic.if.a') !== -1" class="icon-button" title="{{resource.value ? 'Turn off' : 'Turn on'}}" ng-click="state.busy || setBinarySwitchValue(platform, resource, !resource.value);">
                                                 <i class="fa resource-button" ng-class="resource.value ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
                                             </div>
                                             <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.value}}</span>
                                         </div>
                                         <div class="dim-percentage" ng-if="resource.rt[0] === 'oic.r.light.dimming'">
                                             <div class="ct-value-text">{{resource.dimmingSetting}}%</div>
-                                            <div ui-slider class="ct-slider" ng-if="resource.if.indexOf('oic.if.a') !== -1" min="{{resource.range[0]}}" max="{{resource.range[1]}}" ng-model="resource.dimmingSetting" ng-mouseup="setDimmingValue(platform, resource, resource.dimmingSetting)"></div>
+                                            <div ui-slider class="ct-slider" ng-disabled="state.busy" ng-if="resource.if.indexOf('oic.if.a') !== -1" min="{{resource.range[0]}}" max="{{resource.range[1]}}" ng-model="resource.dimmingSetting" ng-mouseup="state.busy || setDimmingValue(platform, resource, resource.dimmingSetting)"></div>
                                         </div>
                                         <div ng-if="resource.rt[0] === 'oic.r.temperature'">
                                             <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
-                                                <input class="ct-text-input" ng-disabled="resource.if.indexOf('oic.if.a') === -1" type="number" name="input" ng-model="resource.temperature">
-                                                <div class="icon-button" title="Set" ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-click="setTemperatureValue(platform, resource, resource.temperature);">
+                                                <input class="ct-text-input form-control" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1" type="number" name="input" ng-model="resource.temperature">
+                                                <div class="icon-button" title="Set" ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-click="state.busy || setTemperatureValue(platform, resource, resource.temperature);">
                                                     <i class="fa fa-arrow-circle-right resource-button"></i>
                                                 </div>
                                             </div>
@@ -96,15 +96,15 @@
                                         </div>
                                         <div ng-if="resource.rt[0] === 'oic.r.humidity'">
                                             <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
-                                                <input class="ct-text-input" ng-disabled="resource.if.indexOf('oic.if.a') === -1" type="number" name="input" ng-model="resource.humidity">
-                                                <div class="icon-button" title="Set" ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-click="setHumidityValue(platform, resource, resource.humidity);">
+                                                <input class="ct-text-input form-control" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1" type="number" name="input" ng-model="resource.humidity">
+                                                <div class="icon-button" title="Set" ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-click="state.busy || setHumidityValue(platform, resource, resource.humidity);">
                                                     <i class="fa fa-arrow-circle-right resource-button"></i>
                                                 </div>
                                             </div>
                                             <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.humidity}}</span>
                                         </div>
                                         <div ng-if="resource.rt[0] === 'oic.r.mode'">
-                                            <select ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-disabled="resource.if.indexOf('oic.if.a') === -1" class="ct-value-select" ng-model="resource.currentMode" ng-change="setModeValue(platform, resource, resource.currentMode)">
+                                            <select ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1" class="ct-value-select form-control" ng-model="resource.currentMode" ng-change="setModeValue(platform, resource, resource.currentMode)">"
                                                 <option ng-repeat="option in resource.supportedModes" value="{{option}}">{{option}}</option>
                                             </select>
                                             <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.currentMode}}</span>
@@ -146,7 +146,7 @@
                                         <span>{{selectedPlatform.info.opent2t.translator}}</span>
                                     </li>
                                 </ul>
-                                <div class="icon-button resource-controls" title="Get All Info" ng-click="getDeviceInfo(selectedPlatform)">
+                                <div class="icon-button resource-controls" title="Get All Info" ng-click="state.busy || getDeviceInfo(selectedPlatform)">
                                     <i class="fa fa-info-circle"></i>
                                 </div>
                             </div>
@@ -156,14 +156,14 @@
                                     <div class="invoke-input">
                                         <div class="input-row">
                                             <label>Method:</label>
-                                            <input class="ct-text-input" type="text" ng-model="invokeMethodName">
+                                            <input class="ct-text-input form-control" type="text" ng-model="invokeMethodName">
                                         </div>
                                         <div class="input-row">
                                             <label title="Stringified parameter array">Params:</label>
-                                            <input class="ct-text-input" type="text" ng-model="invokeMethodParams">
+                                            <input class="ct-text-input form-control" type="text" ng-model="invokeMethodParams">
                                         </div>
                                     </div>
-                                    <div class="icon-button resource-controls" title="Invoke Method" ng-click="invokeDeviceMethod(selectedPlatform, invokeMethodName, invokeMethodParams)">
+                                    <div class="icon-button resource-controls" title="Invoke Method" ng-click="state.busy || invokeDeviceMethod(selectedPlatform, invokeMethodName, invokeMethodParams)">
                                         <i class="fa fa-arrow-circle-right"></i>
                                     </div>
                                 </div>
@@ -176,7 +176,7 @@
                                             <div class="resource-name">{{resource.id}}</div>
                                             <div>{{resource.rt[0]}}</div>
                                         </div>
-                                        <div class="resource-controls actionable" title="Get Info" ng-click="getDeviceProperty(selectedPlatform, resource.id)">
+                                        <div class="resource-controls icon-button" title="Get Info" ng-click="state.busy || getDeviceProperty(selectedPlatform, resource.id)">
                                             <i class="fa fa-info-circle"></i>
                                         </div>
                                     </li>
@@ -188,23 +188,23 @@
                 </div>
 
                 <div class="otr-grid-cell-fit" ng-show="onboarding">
-                    <div class="onboarding-container">
+                    <div class="onboarding-container form-group">
                         <div class="onboarding-question">
                             <span class="onboarding-name">Hub Name
                                 <span class="onboarding-description">(e.g. Contoso Hub)</span>
                             </span>
-                            <input class="onboarding-text-input" type="text" ng-model="hubName">
+                            <input class="onboarding-text-input form-control" type="text" ng-model="hubName">
                         </div>
                         <div class="onboarding-question">
                             <span class="onboarding-name">Hub Package</span>
-                            <select ng-model="hubPackage" ng-disabled="onboardingPhase !== 1">
+                            <select class="form-control" ng-model="hubPackage" ng-disabled="onboardingPhase !== 1">
                                 <option ng-repeat="option in knownHubs" value="{{option}}">{{option}}</option>
                             </select>
                         </div>
                         <div ng-if="onboardingPhase === 2">
                             <div class="onboarding-question" ng-repeat="question in onboardingQuestions">
                                 <span class="onboarding-name">{{question.question}}</span>
-                                <input class="onboarding-text-input" type="{{question.type === 'password' ? 'password' : 'text'}}" ng-model="question.answer">
+                                <input class="onboarding-text-input form-control" type="{{question.type === 'password' ? 'password' : 'text'}}" ng-model="question.answer">
                             </div>
                         </div>
                         <div class="onboarding-controls">
@@ -227,7 +227,7 @@
                         <i class="fa fa-times pull-right icon-button" ng-click="state.showOutput = false"></i>
                     </div>
                     <div class="otr-output-container">
-                        <textarea readonly class="otr-output-area" ng-model="state.currentOutput" ng-class="state.outputType === 'error' ? 'otr-output-error' : 'otr-output-info'"></textarea>
+                        <textarea readonly class="otr-output-area form-control" ng-model="state.currentOutput" ng-class="state.outputType === 'error' ? 'otr-output-error' : 'otr-output-info'"></textarea>
                     </div>
                 </div>
 
