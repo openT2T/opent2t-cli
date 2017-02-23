@@ -9,12 +9,14 @@
         <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
         <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="node_modules/angular-resizable/angular-resizable.min.css">
         <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
         <script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.js"></script>
         <script type="text/javascript" src="bower_components/jquery-ui/ui/widgets/slider.js"></script>
         <script type="text/javascript" src="bower_components/angular/angular.js"></script>
         <script type="text/javascript" src="bower_components/angular-ui-slider/src/slider.js"></script>
+        <script src="node_modules/angular-resizable/angular-resizable.min.js"></script>
         <script src="app.js"></script>
         <link href="css/app.css" rel="stylesheet" type="text/css" />
         <link href="css/controls.css" rel="stylesheet" type="text/css" />
@@ -114,7 +116,7 @@
                         </div>
                     </div>
 
-                    <div class="ct-details-container" ng-show="selectedPlatform != undefined">
+                    <div class="ct-details-container" ng-show="selectedPlatform != undefined" resizable r-directions="['left']" r-flex="true">
                         <div class="otr-panel-header">
                             Device Details
                             <i class="fa fa-times pull-right icon-button" ng-click="selectPlatform(undefined)"></i>
@@ -194,10 +196,10 @@
                             <input class="onboarding-text-input" type="text" ng-model="hubName">
                         </div>
                         <div class="onboarding-question">
-                            <span class="onboarding-name">Hub Package
-                                <span class="onboarding-description">(e.g. opent2t-translator-com-contoso-hub)</span>
-                            </span>
-                            <input class="onboarding-text-input" type="text" ng-model="hubPackage" ng-disabled="onboardingPhase !== 1">
+                            <span class="onboarding-name">Hub Package</span>
+                            <select ng-model="hubPackage" ng-disabled="onboardingPhase !== 1">
+                                <option ng-repeat="option in knownHubs" value="{{option}}">{{option}}</option>
+                            </select>
                         </div>
                         <div ng-if="onboardingPhase === 2">
                             <div class="onboarding-question" ng-repeat="question in onboardingQuestions">
@@ -219,7 +221,7 @@
                     </div>
                 </div>
 
-                <div class="otr-bottom-panel" ng-if="state.showOutput">
+                <div class="otr-bottom-panel" ng-if="state.showOutput" resizable r-directions="['top']" r-flex="true">
                     <div class="otr-panel-header">
                         Output
                         <i class="fa fa-times pull-right icon-button" ng-click="state.showOutput = false"></i>

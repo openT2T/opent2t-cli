@@ -3,6 +3,8 @@ var app = electron.app;
 var BrowserWindow = electron.BrowserWindow;
 var q = require('q');
 var fs = require('fs');
+var glob = require('glob');
+var path = require('path');
 require('electron-reload')(__dirname);
 var Opent2tHelper = require("./Opent2tHelper");
 var opent2tHelper = new Opent2tHelper();
@@ -66,6 +68,8 @@ app.loadConfigs = function () {
     let filePath = "./configs";
     let configs = [];
 
+    app.getKnownHubs();
+
     fs.access(filePath, (err) => {
         if (err) {
             if (err.code === "ENOENT") {
@@ -103,6 +107,12 @@ app.loadConfigs = function () {
     });
 
     return deferred.promise;
+}
+
+app.getKnownHubs = function () {
+    let hubTranslators = glob.sync('./node_modules/opent2t-translator-com-*-hub');
+    let knownHubs = hubTranslators.map(f => path.basename(f));
+    return knownHubs;
 }
 
 app.loadDevices = function (hubName) {

@@ -1,4 +1,4 @@
-var mainModule = angular.module('mainModule', ['ui.slider']);
+var mainModule = angular.module('mainModule', ['ui.slider', 'angularResizable']);
 
 mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', function ($scope, $http, $q, remote, config) {
 
@@ -90,6 +90,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     }
 
     $scope.addHub = function () {
+        $scope.knownHubs = $scope.remoteApp.getKnownHubs();
         $scope.hubName = undefined;
         $scope.hubPackage = undefined;
         $scope.onboardingPhase = 1;
