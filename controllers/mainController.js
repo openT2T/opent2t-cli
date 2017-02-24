@@ -37,7 +37,12 @@ class MainController extends BaseController {
             {
                 type: 'input',
                 name: 'hubPackage',
-                message: 'What is the name of the hub to onboard (e.g. opent2t-translator-com-contoso-hub)'
+                message: 'What is the name of the hub package (e.g. opent2t-translator-com-contoso-hub)'
+            },
+            {
+                type: 'input',
+                name: 'hubName',
+                message: 'What would you like to name the hub (e.g. Contoso Hub)'
             }
         ];
 
@@ -46,7 +51,8 @@ class MainController extends BaseController {
                 let fileName = helpers.createOnboardingFileName(answers.hubPackage);
                 let onboardingCli = new OnboardingCli();
                 onboardingCli.doOnboarding(answers.hubPackage).then(info => {
-                    let data = JSON.stringify(info);
+                    let configData = helpers.createConfigData(answers.hubName, answers.hubPackage, info);
+                    let data = JSON.stringify(configData);
                     fs.writeFile(fileName, data, function (err) {
                         if (err) {
                             deferred.reject(err);
@@ -87,10 +93,12 @@ class MainController extends BaseController {
             onboardingCli.loadTranslatorAndGetOnboardingAnswers(results.hubPackage).then(answers => {
                 let fileName = helpers.createOnboardingFileName(results.hubPackage);
                 helpers.readFile(fileName, "Please complete onboarding").then(data => {
-                    let authInfo = JSON.parse(data);
+                    let configInfo = JSON.parse(data);
+                    let authInfo = configInfo.authInfo;
                     OpenT2T.createTranslatorAsync(results.hubPackage, authInfo).then(translator => {
                         OpenT2T.invokeMethodAsync(translator, "", 'refreshAuthToken', [answers]).then(refreshedInfo => {
-                            let refreshedData = JSON.stringify(refreshedInfo);
+                            let configData = helpers.createConfigData(configInfo.translator, configInfo.translatorPackageName, refreshedInfo);
+                            let refreshedData = JSON.stringify(configData);
                             fs.writeFile(fileName, refreshedData, function (err) {
                                 if (err) {
                                     deferred.reject(err);
@@ -128,7 +136,7 @@ class MainController extends BaseController {
             let hub = { name: answers.hubName };
             let fileName = helpers.createOnboardingFileName(hub.name);
             helpers.readFile(fileName, "Please complete onboarding").then(data => {
-                hub.deviceInfo = JSON.parse(data);
+                hub.deviceInfo = JSON.parse(data).authInfo;
                 OpenT2T.createTranslatorAsync(hub.name, hub.deviceInfo).then(translator => {
                     hub.translator = translator;
                     OpenT2T.invokeMethodAsync(translator, "", 'getPlatforms', []).then(info => {

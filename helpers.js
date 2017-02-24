@@ -15,19 +15,19 @@ function writeArrayToFile(arrayObject, fileNameBase, propertyToAppend, i) {
     if (i >= arrayObject.length) {
         return;
     }
-    
+
     let item = arrayObject[i];
-    
+
     let fileName = item.opent2t.translator + fileNameBase + item.opent2t[propertyToAppend] + ".json";
 
-    console.log("------ Saving device %j to: %j", item.opent2t[propertyToAppend], fileName); 
+    console.log("------ Saving device %j to: %j", item.opent2t[propertyToAppend], fileName);
     let contents = JSON.stringify(item);
     fs.writeFile(fileName, contents, function (err, data) {
         if (err) {
             return console.log(err);
         }
 
-        return writeArrayToFile(arrayObject, fileNameBase, propertyToAppend, i+1);
+        return writeArrayToFile(arrayObject, fileNameBase, propertyToAppend, i + 1);
     });
 }
 
@@ -37,7 +37,7 @@ function writeArrayToFile(arrayObject, fileNameBase, propertyToAppend, i) {
 function readFile(fileName, errorMessage) {
     let deferred = q.defer();
 
-    fs.readFile(fileName, 'utf8', function (err,data) {
+    fs.readFile(fileName, 'utf8', function (err, data) {
         if (err) {
             if (err.errno === -4058) {
                 deferred.reject(errorMessage);
@@ -61,6 +61,10 @@ function logError(error) {
     if (error.stack) {
         console.log(colors.red(error.stack));
     }
+}
+
+function createConfigData(name, packageName, authInfo) {
+    return { translator: name, translatorPackageName: packageName, authInfo: authInfo };
 }
 
 function createHubDeviceFileName(hubName, deviceId) {
@@ -95,3 +99,4 @@ module.exports.logHeader = logHeader;
 module.exports.logDebug = logDebug;
 module.exports.createOnboardingFileName = createOnboardingFileName;
 module.exports.createHubDeviceFileName = createHubDeviceFileName;
+module.exports.createConfigData = createConfigData;

@@ -5,6 +5,7 @@ var q = require('q');
 var fs = require('fs');
 var glob = require('glob');
 var path = require('path');
+var rootPath = path.join(__dirname, '..');
 require('electron-reload')(__dirname);
 var Opent2tHelper = require("./Opent2tHelper");
 var opent2tHelper = new Opent2tHelper();
@@ -27,14 +28,13 @@ app.on('window-all-closed', function () {
 app.on('ready', function () {
     // Create the browser window.
     mainWindow = new BrowserWindow({ width: 1198, height: 750, frame: true, show: false, autoHideMenuBar: true });
-    //mainWindow.$ = mainWindow.jQuery = require('./lib/jquery-2.1.4.min.js');
 
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
     });
 
-    // and load the index.html of the app.
-    mainWindow.loadURL('file://' + __dirname + '/index.html');
+    // and load the app.html of the app.
+    mainWindow.loadURL('file://' + __dirname + '/app.html');
 
     // Uncomment this to see the browser developer tools.
     // mainWindow.openDevTools();
@@ -65,60 +65,36 @@ app.readFile = function (fileName) {
 
 app.loadConfigs = function () {
     let deferred = q.defer();
-    let filePath = "./configs";
     let configs = [];
+    let hubInfoFiles = glob.sync(path.join(rootPath, '*_onboardingInfo.json'));
 
     app.getKnownHubs();
 
-    fs.access(filePath, (err) => {
-        if (err) {
-            if (err.code === "ENOENT") {
-                fs.mkdir(filePath, function (e) {
-                    if (err) {
-                        deferred.reject(err);
-                    } else {
-                        deferred.resolve(configs);
-                    }
-                });
-            } else {
-                deferred.reject(err);
-            }
+    let promises = [];
+    hubInfoFiles.forEach((item) => {
+        promises.push(app.readFile(item));
+    });
+
+    q.all(promises).then(results => {
+        for (var i = 0; i < results.length; i++) {
+            configs.push(JSON.parse(results[i]));
         }
-
-        fs.readdir(filePath, (err, files) => {
-            if (err) {
-                deferred.reject(err);
-            }
-
-            if (files !== undefined) {
-                let promises = [];
-                files.forEach((item, index) => {
-                    promises.push(app.readFile(filePath + "/" + item));
-                });
-
-                q.all(promises).then(results => {
-                    for (var i = 0; i < results.length; i++) {
-                        configs.push(JSON.parse(results[i]));
-                    }
-                    deferred.resolve(configs);
-                });
-            }
-        });
+        deferred.resolve(configs);
     });
 
     return deferred.promise;
 }
 
 app.getKnownHubs = function () {
-    let hubTranslators = glob.sync('./node_modules/opent2t-translator-com-*-hub');
+    let hubTranslators = glob.sync(rootPath + '/node_modules/opent2t-translator-com-*-hub');
     let knownHubs = hubTranslators.map(f => path.basename(f));
     return knownHubs;
 }
 
 app.loadDevices = function (hubName) {
     let deferred = q.defer();
+    let fileName = path.join(rootPath, `${hubName}_onboardingInfo.json`);
 
-    let fileName = "./configs/" + hubName + ".json";
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => {
         let deviceInfo = JSON.parse(data).authInfo;
         opent2tHelper.getProperty(hubName, deviceInfo, 'get', [true]).then(info => {
@@ -203,7 +179,7 @@ app.getProperty = function (hubName, thingInfo, deviceId, property) {
 app.initiateOnboarding = function (translatorName) {
     var deferred = q.defer();
 
-    opent2tHelper.getTranslatorInfo(translatorName).then(info => {
+    opent2tHelper.getTranslatorInfo(path.join(rootPath, 'node_modules', translatorName)).then(info => {
         deferred.resolve(info);
     }).catch(error => {
         deferred.reject(error);
@@ -232,7 +208,7 @@ app.doOnboarding = function (name, translatorName, onboardingInfo, answers) {
     onboarding.onboard(answers).then(info => {
         let hubInfo = { translator: name, translatorPackageName: translatorName, authInfo: info };
         let data = JSON.stringify(hubInfo);
-        fs.writeFile(`./configs/${translatorName}.json`, data, function (error) {
+        fs.writeFile(path.join(rootPath, `${translatorName}_onboardingInfo.json`), data, function (error) {
             if (error) {
                 deferred.reject(error);
             }
@@ -249,8 +225,8 @@ app.doOnboarding = function (name, translatorName, onboardingInfo, answers) {
 
 function createHub(hubName) {
     let deferred = q.defer();
+    let fileName = path.join(rootPath, `${hubName}_onboardingInfo.json`);
 
-    let fileName = "./configs/" + hubName + ".json";
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => {
         let deviceInfo = JSON.parse(data).authInfo;
         opent2tHelper.createTranslator(hubName, deviceInfo).then(translator => {

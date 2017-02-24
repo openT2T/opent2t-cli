@@ -173,6 +173,7 @@ small {
 .ct-value-select
 {
     height:22px;
+    padding: 0px;
 }
 
 .ct-temp-controls {
@@ -249,6 +250,13 @@ small {
     visibility: visible;
     margin-top:auto;
     margin-bottom: auto;
+}
+
+.busy .actionable,
+.busy .ui-slider,
+.busy .ui-slider .ui-slider-handle
+{
+    cursor:not-allowed;
 }
 
 .dim-percentage
