@@ -47,7 +47,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         $scope.selectedPlatform = undefined;
         $scope.loadingMessage = 'Loading Hub';
 
-        if (hub !== undefined && $scope.hubData[hub.translatorPackageName] === undefined) {
+        if (hub !== undefined) {
             $scope.loading = true;
             getHubData(hub).then(platforms => {
                 $scope.selectedHub = hub;
@@ -56,9 +56,6 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
                 $scope.loading = false;
                 logError(error);
             });
-        }
-        else {
-            $scope.selectPlatform($scope.hubData[$scope.selectedHub.translatorPackageName][0]);
         }
     }
 
