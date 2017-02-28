@@ -25,7 +25,6 @@ colors.setTheme({
 program
     .version('1.0.0')
     .option('-o --onboarding [Translator Package Name]', 'Do onboarding for specified thing')
-    .option('-n --name [Translator Name]', 'Name to assign to translator')
     .option('-h --hub [Hub Name]', 'Gets devices for the given hub')
     .option('-r --refreshAuthToken [Translator Package Name]', 'Refresh the oauth token for the given hub')
 
@@ -46,18 +45,18 @@ if (program.menu) {
 }
 
 else if (program.onboarding) {
-    if (program.name === undefined) {
-        console.log("Need to provide name, -n <name>");
+    if (program.hub === undefined) {
+        console.log("Need to provide hub name, -h <hub name>");
         return;
     }
 
     console.log("------ Doing onboarding for %j".header, program.onboarding);
 
-    var fileName = helpers.createOnboardingFileName(program.name);
+    var fileName = helpers.createOnboardingFileName(program.hub);
 
     var onboardingCli = new OnboardingCli();
     onboardingCli.doOnboarding(program.onboarding).then(info => {
-        let configData = helpers.createConfigData(program.name, program.onboarding, info);
+        let configData = helpers.createConfigData(program.hub, program.onboarding, info);
         let data = JSON.stringify(configData);
         helpers.logObject(info);
         console.log("------ Saving onboardingInfo to: " + fileName);
