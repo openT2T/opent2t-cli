@@ -47,8 +47,8 @@ class MainController extends BaseController {
         ];
 
         inquirer.prompt(questions).then(function (answers) {
-            if (MainController.knownHubs.indexOf(answers.hubPackage) === -1) {
-                let fileName = helpers.createOnboardingFileName(answers.hubPackage);
+            if (MainController.knownHubs.indexOf(answers.hubName) === -1) {
+                let fileName = helpers.createOnboardingFileName(answers.hubName);
                 let onboardingCli = new OnboardingCli();
                 onboardingCli.doOnboarding(answers.hubPackage).then(info => {
                     let configData = helpers.createConfigData(answers.hubName, answers.hubPackage, info);
@@ -59,7 +59,7 @@ class MainController extends BaseController {
                         }
                         else {
                             console.log("Saved!");
-                            MainController.knownHubs.push(answers.hubPackage);
+                            MainController.knownHubs.push(answers.hubName);
                             deferred.resolve(state);
                         }
                     });
@@ -68,7 +68,7 @@ class MainController extends BaseController {
                 });
             }
             else {
-                console.log("\nHub %s has already been onboarded.\n".header, answers.hubPackage);
+                console.log("\nHub %s has already been onboarded.\n".header, answers.hubName);
                 deferred.resolve(state);
             }
         });
@@ -90,12 +90,12 @@ class MainController extends BaseController {
 
         inquirer.prompt(questions).then(function (results) {
             let onboardingCli = new OnboardingCli();
-            onboardingCli.loadTranslatorAndGetOnboardingAnswers(results.hubPackage).then(answers => {
-                let fileName = helpers.createOnboardingFileName(results.hubPackage);
-                helpers.readFile(fileName, "Please complete onboarding").then(data => {
-                    let configInfo = JSON.parse(data);
-                    let authInfo = configInfo.authInfo;
-                    OpenT2T.createTranslatorAsync(results.hubPackage, authInfo).then(translator => {
+            let fileName = helpers.createOnboardingFileName(results.hubPackage);
+            helpers.readFile(fileName, "Please complete onboarding").then(data => {
+                let configInfo = JSON.parse(data);
+                let authInfo = configInfo.authInfo;
+                onboardingCli.loadTranslatorAndGetOnboardingAnswers(configInfo.translatorPackageName).then(answers => {
+                    OpenT2T.createTranslatorAsync(configInfo.translatorPackageName, authInfo).then(translator => {
                         OpenT2T.invokeMethodAsync(translator, "", 'refreshAuthToken', [answers]).then(refreshedInfo => {
                             let configData = helpers.createConfigData(configInfo.translator, configInfo.translatorPackageName, refreshedInfo);
                             let refreshedData = JSON.stringify(configData);
@@ -136,8 +136,9 @@ class MainController extends BaseController {
             let hub = { name: answers.hubName };
             let fileName = helpers.createOnboardingFileName(hub.name);
             helpers.readFile(fileName, "Please complete onboarding").then(data => {
-                hub.deviceInfo = JSON.parse(data).authInfo;
-                OpenT2T.createTranslatorAsync(hub.name, hub.deviceInfo).then(translator => {
+                let configInfo = JSON.parse(data);
+                hub.deviceInfo = configInfo.authInfo;
+                OpenT2T.createTranslatorAsync(configInfo.translatorPackageName, hub.deviceInfo).then(translator => {
                     hub.translator = translator;
                     OpenT2T.invokeMethodAsync(translator, "", 'getPlatforms', []).then(info => {
                         hub.platforms = info.platforms;

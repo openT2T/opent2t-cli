@@ -197,7 +197,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         $scope.state.busy = true;
         clearLog();
         $scope.state.showOutput = true;
-        $scope.remoteApp.getProperty($scope.selectedHub.translatorPackageName, device.info, device.info.entities[0].di, property).then(info => {
+        $scope.remoteApp.getProperty($scope.selectedHub.translator, device.info, device.info.entities[0].di, property).then(info => {
             logInfo(JSON.stringify(info, null, 2));
             $scope.state.busy = false;
             $scope.$apply();
@@ -252,9 +252,9 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     $scope.invokeDeviceMethod = function (device, methodName, params) {
         clearLog();
         $scope.state.busy = true;
-        $scope.remoteApp.invokeDeviceMethod($scope.selectedHub.translatorPackageName, device.info, methodName, params).then(info => {
+        $scope.remoteApp.invokeDeviceMethod($scope.selectedHub.translator, device.info, methodName, params).then(info => {
             logInfo(JSON.stringify(info, null, 2));
-            $scope.remoteApp.getDeviceInfo($scope.selectedHub.translatorPackageName, device.info).then(deviceInfo => {
+            $scope.remoteApp.getDeviceInfo($scope.selectedHub.translator, device.info).then(deviceInfo => {
                 device.info = deviceInfo;
                 $scope.state.busy = false;
                 $scope.$apply();
@@ -275,12 +275,12 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         let deferred = $q.defer();
         $scope.state.busy = true;
 
-        $scope.remoteApp.setProperty($scope.selectedHub.translatorPackageName, device.info, device.info.entities[0].di, property.id, payload).then(info => {
+        $scope.remoteApp.setProperty($scope.selectedHub.translator, device.info, device.info.entities[0].di, property.id, payload).then(info => {
             logInfo(JSON.stringify(info, null, 2));
             deferred.resolve(info);
             $scope.state.busy = false;
         }).catch(error => {
-            $scope.remoteApp.getDeviceInfo($scope.selectedHub.translatorPackageName, device.info).then(deviceInfo => {
+            $scope.remoteApp.getDeviceInfo($scope.selectedHub.translator, device.info).then(deviceInfo => {
                 device.info = deviceInfo;
                 $scope.state.busy = false;
                 $scope.$apply();
@@ -298,7 +298,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     function getHubData(hub) {
         let deferred = $q.defer();
 
-        $scope.remoteApp.loadDevices(hub.translatorPackageName).then(info => {
+        $scope.remoteApp.loadDevices(hub.translator).then(info => {
             let platforms = [];
             for (var i = 0; i < info.platforms.length; i++) {
                 let platform = info.platforms[i];

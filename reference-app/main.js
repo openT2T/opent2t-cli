@@ -96,8 +96,9 @@ app.loadDevices = function (hubName) {
     let fileName = path.join(rootPath, `${hubName}_onboardingInfo.json`);
 
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => {
-        let deviceInfo = JSON.parse(data).authInfo;
-        opent2tHelper.getProperty(hubName, deviceInfo, 'get', [true]).then(info => {
+        let configInfo = JSON.parse(data);
+        let deviceInfo = configInfo.authInfo;
+        opent2tHelper.getProperty(configInfo.translatorPackageName, deviceInfo, 'get', [true]).then(info => {
             deferred.resolve(info);
         }).catch(error => {
             deferred.reject(error);
@@ -206,9 +207,11 @@ app.doOnboarding = function (name, translatorName, onboardingInfo, answers) {
     let onboarding = new Onboarding();
 
     onboarding.onboard(answers).then(info => {
+        name = helpers.sanitzeFileName(name);
         let hubInfo = { translator: name, translatorPackageName: translatorName, authInfo: info };
         let data = JSON.stringify(hubInfo);
-        fs.writeFile(path.join(rootPath, `${translatorName}_onboardingInfo.json`), data, function (error) {
+        let fileName = `${name}_onboardingInfo.json`;
+        fs.writeFile(path.join(rootPath, fileName), data, function (error) {
             if (error) {
                 deferred.reject(error);
             }
@@ -228,8 +231,9 @@ function createHub(hubName) {
     let fileName = path.join(rootPath, `${hubName}_onboardingInfo.json`);
 
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => {
-        let deviceInfo = JSON.parse(data).authInfo;
-        opent2tHelper.createTranslator(hubName, deviceInfo).then(translator => {
+        let configInfo = JSON.parse(data);
+        let deviceInfo = configInfo.authInfo;
+        opent2tHelper.createTranslator(configInfo.translatorPackageName, deviceInfo).then(translator => {
             deferred.resolve(translator);
         }).catch(error => {
             deferred.reject(error);
