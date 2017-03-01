@@ -72,12 +72,12 @@ function createHubDeviceFileName(hubName, deviceId) {
     return createSaveFileName(hubName, "_device_" + deviceId);
 }
 
-function sanitzeFileName(fileName) {
+function sanitizeFileName(fileName) {
     return sanitize(fileName);
 }
 
 function createOnboardingFileName(baseName) {
-    return createSaveFileName(sanitzeFileName(baseName), "_onboardingInfo");
+    return createSaveFileName(sanitizeFileName(baseName), "_onboardingInfo");
 }
 
 function createSaveFileName(baseName, trailing) {
@@ -103,6 +103,6 @@ module.exports.logError = logError;
 module.exports.logHeader = logHeader;
 module.exports.logDebug = logDebug;
 module.exports.createOnboardingFileName = createOnboardingFileName;
-module.exports.sanitzeFileName = sanitzeFileName;
+module.exports.sanitizeFileName = sanitizeFileName;
 module.exports.createHubDeviceFileName = createHubDeviceFileName;
 module.exports.createConfigData = createConfigData;

@@ -207,7 +207,7 @@ app.doOnboarding = function (name, translatorName, onboardingInfo, answers) {
     let onboarding = new Onboarding();
 
     onboarding.onboard(answers).then(info => {
-        name = helpers.sanitzeFileName(name);
+        name = helpers.sanitizeFileName(name);
         let hubInfo = { translator: name, translatorPackageName: translatorName, authInfo: info };
         let data = JSON.stringify(hubInfo);
         let fileName = `${name}_onboardingInfo.json`;
