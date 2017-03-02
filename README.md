@@ -39,7 +39,7 @@ npm install opent2t-translator-com-wink-thermostat
 ```
 2. First step is to do the onboarding. Wink communicates via the hub so you need to set that up first
 ```bash
-node index.js -o opent2t-translator-com-wink-hub
+node index.js -o opent2t-translator-com-wink-hub -h WinkHub
 ```
 
 You'll be prompted for some info:
@@ -52,14 +52,14 @@ You'll be prompted for some info:
 
 You should see the output of the CLI and it ends with the following:
 ```bash
-Saving onboaringInfo to: ./opent2t-translator-com-wink-hub_onboardingInfo.json
+Saving onboaringInfo to: ./WinkHub_onboardingInfo.json
 Saved!
 ```
 After this, your access token info has been saved so you should not have to do this step again.
 
 3. Enumerate devices on the hub and find the device id you want to use (in this case the thermostat)
 ```bash
-node index.js -h opent2t-translator-com-wink-hub
+node index.js -h WinkHub
 ```
 This will print out the devices that the hub sees and also creates json files so the cli can use this info later.
 
@@ -70,7 +70,7 @@ This will print out the devices that the hub sees and also creates json files so
 
 4. Get the thermostat info
 ```bash
-node index.js -h opent2t-translator-com-wink-hub -t opent2t-translator-com-wink-thermostat -i 152846 -g ThermostatResURI
+node index.js -h WinkHub -t opent2t-translator-com-wink-thermostat -i 152846 -g ThermostatResURI
 ```
 Let's break this call down:
 * -h is the hub you're communicating through
