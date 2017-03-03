@@ -187,6 +187,12 @@ small {
     height:22px;
 }
 
+.ct-color-input
+{
+    padding-left:2px;
+    padding-right:2px;
+}
+
 .ct-color-display {
     width:15px;
     height:15px;

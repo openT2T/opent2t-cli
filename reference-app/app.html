@@ -72,7 +72,7 @@
                                 </div>
                             </div>
                             <div class="ct-resources" ng-class="{'ct-x-large-resources':platform.info.entities[0].resources.length > 10}">
-                                <div class="ct-resource-container" ng-repeat="resource in platform.info.entities[0].resources">
+                                <div class="ct-resource-container" ng-repeat="resource in platform.info.entities[0].resources" ng-style="getResourceStyle(resource)">
                                     <div class="ct-name-container" title="{{resource.id}}">{{resource.id}}</div>
                                     <div class="ct-value-container">
                                         <div ng-if="resource.rt[0] === 'oic.r.switch.binary'">
@@ -108,6 +108,26 @@
                                                 <option ng-repeat="option in resource.supportedModes" value="{{option}}">{{option}}</option>
                                             </select>
                                             <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.currentMode}}</span>
+                                        </div>
+                                        <div ng-if="resource.rt[0] === 'oic.r.colour.chroma'">
+                                            <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
+                                                <input class="ct-text-input form-control" ng-disabled="state.busy" type="number" name="input" ng-model="resource.ct">
+                                                <div class="icon-button" title="Set" ng-click="state.busy || setColourChroma(platform, resource, resource.ct);">
+                                                    <i class="fa fa-arrow-circle-right resource-button"></i>
+                                                </div>
+                                            </div>
+                                            <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.ct}}</span>
+                                        </div>
+                                        <div ng-if="resource.rt[0] === 'oic.r.colour.rgb'">
+                                            <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
+                                                <input class="ct-text-input ct-color-input form-control" ng-disabled="state.busy" type="text" ng-model="resource.currentRed">
+                                                <input class="ct-text-input ct-color-input form-control" ng-disabled="state.busy" type="text" ng-model="resource.currentGreen">
+                                                <input class="ct-text-input ct-color-input form-control" ng-disabled="state.busy" type="text" ng-model="resource.currentBlue">
+                                                <div class="icon-button" title="Set" ng-click="state.busy || setColourRgb(platform, resource);">
+                                                    <i class="fa fa-arrow-circle-right resource-button"></i>
+                                                </div>
+                                            </div>
+                                            <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.rgbvalue[0]}}, {{resource.rgbvalue[1]}}, {{resource.rgbvalue[2]}}</span>
                                         </div>
                                         <span ng-if="resource.rt[0] === 'oic.r.sensor'">{{resource.value}}</span>
                                     </div>
