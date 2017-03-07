@@ -102,7 +102,11 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
                     }
                 }
                 else if (flowItem.name === 'askUserPermission') {
-                    $scope.onboardingUrl = { url: flowItem.flow[0].descriptions.en, index: i };
+                    $scope.onboardingUrl = {
+                        description: flowItem.flow[0].descriptions.en,
+                        name: flowItem.flow[0].name,
+                        index: i
+                    }
                 }
             }
             $scope.$apply();
@@ -151,7 +155,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         else {
             $scope.loadingMessage = 'Getting User Permission';
             $scope.loading = true;
-            $scope.remoteApp.getUserPermission($scope.onboardingUrl.url, answers).then(code => {
+            $scope.remoteApp.getUserPermission($scope.onboardingInfo.onboarding, $scope.onboardingUrl, answers).then(code => {
                 answers[$scope.onboardingUrl.index] = code;
                 $scope.loading = false;
                 deferred.resolve(answers);
