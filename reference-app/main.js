@@ -194,10 +194,12 @@ app.initiateOnboarding = function (translatorName) {
     return deferred.promise;
 }
 
-app.getUserPermission = function (permissionUrl, answers) {
+app.getUserPermission = function (onboardingInfo, flow, answers) {
     var deferred = q.defer();
+    let Onboarding = require(onboardingInfo);
+    let onboarding = new Onboarding();
 
-    opent2tHelper.getUserPermission(permissionUrl, answers).then(code => {
+    opent2tHelper.getUserPermission(onboarding, flow, answers).then(code => {
         deferred.resolve(code);
     }).catch(error => {
         deferred.reject(error);

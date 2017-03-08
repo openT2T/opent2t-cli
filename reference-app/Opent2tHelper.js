@@ -91,32 +91,33 @@ class Opent2tHelper {
         return deferred.promise;
     }
 
-    getUserPermission(url, answers) {
-        var deferred = q.defer();
-        if (url === undefined) {
-            deferred.resolve();
+    getUrl(onboarding, flow, answers) {
+        if (flow.name === 'url') {
+            var replaceVars = this.getReplaceVars(answers);
+            return Promise.resolve(this.replaceVarsInValue(flow.description, replaceVars));
+        } else if (flow.name === 'method') {
+            return onboarding[flow.description](answers);
         }
-        else {
+    }
+
+    getUserPermission(onboarding, flow, answers) {
+        var deferred = q.defer();
+    
+        this.getUrl(onboarding, flow, answers).then((url) => {
             var open = require('open');
             var express = require('express');
             var port = 8080;
             var app = express();
-            var replaceVars = this.getReplaceVars(answers);
-            url = this.replaceVarsInValue(url, replaceVars);
 
             app.get("/success", function (req, res) {
                 res.send("success!");
-
-                // load the auth code and return it
-                // todo is this different for different providers?
-                var code = req.query.code;
-                deferred.resolve(code);
+                deferred.resolve(req.url);
             });
 
             app.listen(port, function () {
                 open(url);
             });
-        }
+        });
 
         return deferred.promise;
     }

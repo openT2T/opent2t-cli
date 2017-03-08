@@ -28,9 +28,9 @@ class OnboardingCli {
                 helpers.logObject(tinfo);
                 console.log("-----------------------------");
 
-                return this.performFlow(tinfo.onboardingFlow).then(answers => {
-                    var Onboarding = require(tinfo.onboarding);
-                    var onboarding = new Onboarding();
+                var Onboarding = require(tinfo.onboarding);
+                var onboarding = new Onboarding();
+                return this.performFlow(onboarding, tinfo.onboardingFlow).then(answers => {
                     return onboarding.onboard(answers);
                 });
             }
@@ -55,16 +55,17 @@ class OnboardingCli {
                 console.log("-----------------------------");
                 
                 var onboardingAnswers = [];
-                // We only require the clientId/clientSecret for Wink Hub (generalizing this right now)
-                // TODO: See how this differs with SmartThings; If radically different we'd need separate
-                // CLI implementation for WINK and SMARTTHINGS
-                return this.performFlow(tinfo.onboardingFlow, 1, onboardingAnswers);
+                
+                // TODO: initialize an onboarding here
+                var Onboarding = require(tinfo.onboarding);
+                var onboarding = new Onboarding();
+                return this.performFlow(onboarding, tinfo.onboardingFlow, 1, onboardingAnswers);
             }
         });
     }
 
     // does the onboarding flow and asks the user any input
-    performFlow(onboardingFlow, i, onboardingAnswers) {
+    performFlow(onboarding, onboardingFlow, i, onboardingAnswers) {
         if (!!!i) {
             i = 0;
         }
@@ -87,26 +88,42 @@ class OnboardingCli {
             var inquirerInput = this.convertFlowToInquirer(flowItem);
             return inquirer.prompt(inquirerInput).then(answers => {
                 onboardingAnswers.push(answers);
-                return this.performFlow(onboardingFlow, i + 1, onboardingAnswers);
+                return this.performFlow(onboarding, onboardingFlow, i + 1, onboardingAnswers);
             });
         }
         else if (flowItem.name === "askUserPermission") {
             // create the url by resolving variables with values retrieved
             // todo where to put these helper methods?
-            var replaceVars = this.getReplaceVars(onboardingFlow, onboardingAnswers, i);
-            var url = flowItem.flow[0].descriptions.en;
-            url = this.replaceVarsInValue(url, replaceVars); 
+            
+            // Always use flow[0] for backwards compatibility
+            var flow = {
+                description: flowItem.flow[0].descriptions.en,
+                name: flowItem.flow[0].name,
+            }
 
-            // start server and route to url
-            return this.doWebFlow(url).then(accessCode => {
-                onboardingAnswers.push(accessCode);
-                return this.performFlow(onboardingFlow, i + 1, onboardingAnswers);
+            return this.getUrl(onboarding, flow, onboardingAnswers).then((url) => {
+                // start server and route to url
+                return this.doWebFlow(url).then(returnUrl => {
+                    onboardingAnswers.push(returnUrl);
+                    return this.performFlow(onboarding, onboardingFlow, i + 1, onboardingAnswers);
+                });
             });
-
         }
         else {
             console.log("Unsupported flow element: " + flowItem.name);
-            return this.performFlow(onboardingFlow, i + 1, onboardingAnswers);
+            return this.performFlow(onboarding, onboardingFlow, i + 1, onboardingAnswers);
+        }
+    }
+
+    /**
+     * Gets either a static URL from the manifest, or asks the onboarder to create one.
+     */
+    getUrl(onboarding, flow, answers) {
+        if (flow.name === 'url') {
+            var replaceVars = this.getReplaceVars(answers);
+            return Promise.resolve(this.replaceVarsInValue(flow.description, replaceVars));
+        } else if (flow.name === 'method') {
+            return onboarding[flow.description](answers);
         }
     }
 
@@ -122,7 +139,6 @@ class OnboardingCli {
         var toReturn = value;
         for (var i = 0; i < replaceVars.length; i++) {
             var replaceItem = replaceVars[i];
-            console.log("Replace " + replaceItem.key + " with " + replaceItem.value);
             toReturn = toReturn.replace(replaceItem.key, replaceItem.value);
         }
 
@@ -130,16 +146,15 @@ class OnboardingCli {
     }
 
     // given the users answers, creates a {key}/value array
-    getReplaceVars(onboardingFlow, answers, i) {
+    getReplaceVars(answers) {
         var replaceVars = cliVars.slice(0);
-        for (var j = 0; j < i; j++) {
-            var flowItem = onboardingFlow[j];
-            
-            for (var k = 0; k < flowItem.flow.length; k++) {
-                var element = flowItem.flow[k];
 
-                var replaceItem = { "key": "{" + element.name + "}", "value": answers[j][element.name]};
-                replaceVars.push(replaceItem);
+        for (let i = 0; i < answers.length; i++) {
+            let answer = answers[i];
+            for (var property in answer) {
+                if (answer.hasOwnProperty(property)) {
+                    replaceVars.push({ "key": "{" + property + "}", "value": answer[property] });
+                }
             }
         }
 
@@ -185,12 +200,8 @@ class OnboardingCli {
 
             console.log("State verification: " + (req.query.state === state));
 
-            // load the auth code and return it
-            // todo is this different for different providers?
-            var code = req.query.code;
-            helpers.logObject(req.query);
-            console.log(code);
-            deferred.resolve(code);
+            helpers.logObject(req.url);
+            deferred.resolve(req.url);
         });
 
         app.listen(port, function() {
