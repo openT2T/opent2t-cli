@@ -4,11 +4,12 @@ var fs = require('fs');
 var q = require('q');
 var colors = require('colors');
 var sanitize = require("sanitize-filename");
+var path = require('path');
 
 // writes the given array to a set of files
 // one file per array object
 // file name is based on fileNameBase + array[i][propertyToAppend]
-function writeArrayToFile(arrayObject, fileNameBase, propertyToAppend, i) {
+function writeArrayToFile(arrayObject, configRoot, fileNameBase, propertyToAppend, i) {
     if (!i) {
         i = 0;
     }
@@ -19,7 +20,7 @@ function writeArrayToFile(arrayObject, fileNameBase, propertyToAppend, i) {
 
     let item = arrayObject[i];
 
-    let fileName = item.opent2t.translator + fileNameBase + item.opent2t[propertyToAppend] + ".json";
+    let fileName = path.join(configRoot, item.opent2t.translator + fileNameBase + item.opent2t[propertyToAppend] + ".json");
 
     console.log("------ Saving device %j to: %j", item.opent2t[propertyToAppend], fileName);
     let contents = JSON.stringify(item);
@@ -28,7 +29,7 @@ function writeArrayToFile(arrayObject, fileNameBase, propertyToAppend, i) {
             return console.log(err);
         }
 
-        return writeArrayToFile(arrayObject, fileNameBase, propertyToAppend, i + 1);
+        return writeArrayToFile(arrayObject, configRoot, fileNameBase, propertyToAppend, i + 1);
     });
 }
 

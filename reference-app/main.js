@@ -6,10 +6,15 @@ var fs = require('fs');
 var glob = require('glob');
 var path = require('path');
 var rootPath = path.join(__dirname, '..');
-require('electron-reload')(__dirname);
 var Opent2tHelper = require("./Opent2tHelper");
 var opent2tHelper = new Opent2tHelper();
 var helpers = require('../helpers');
+var findup = require('findup-sync');
+
+// Uncomment the following line during development to get automatic updating.
+// require('electron-reload')(__dirname);
+
+var modulesRoot = findup('node_modules');
 
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -86,7 +91,7 @@ app.loadConfigs = function () {
 }
 
 app.getKnownHubs = function () {
-    let hubTranslators = glob.sync(rootPath + '/node_modules/opent2t-translator-com-*-hub');
+    let hubTranslators = glob.sync(modulesRoot + '/opent2t-translator-com-*-hub');
     let knownHubs = hubTranslators.map(f => path.basename(f));
     return knownHubs;
 }
@@ -180,7 +185,7 @@ app.getProperty = function (hubName, thingInfo, deviceId, property) {
 app.initiateOnboarding = function (translatorName) {
     var deferred = q.defer();
 
-    opent2tHelper.getTranslatorInfo(path.join(rootPath, 'node_modules', translatorName)).then(info => {
+    opent2tHelper.getTranslatorInfo(path.join(modulesRoot, translatorName)).then(info => {
         deferred.resolve(info);
     }).catch(error => {
         deferred.reject(error);

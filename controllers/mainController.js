@@ -9,12 +9,13 @@ var OnboardingCli = require("../onboardingCli");
 var helpers = require('../helpers');
 var BaseController = require("./baseController");
 var HubController = require("./hubController");
+var configRoot = path.join(__dirname, '../');
 
 class MainController extends BaseController {
     constructor() {
         super();
 
-        let hubInfoFiles = glob.sync('./*_onboardingInfo.json');
+        let hubInfoFiles = glob.sync(path.join(configRoot, '*_onboardingInfo.json'));
         MainController.knownHubs = hubInfoFiles.map(f => path.basename(f).replace('_onboardingInfo.json', ''));
         this.addOperation('Onboard hub', MainController.onboardHub);
     }
@@ -48,7 +49,7 @@ class MainController extends BaseController {
 
         inquirer.prompt(questions).then(function (answers) {
             if (MainController.knownHubs.indexOf(answers.hubName) === -1) {
-                let fileName = helpers.createOnboardingFileName(answers.hubName);
+                let fileName = path.join(configRoot, helpers.createOnboardingFileName(answers.hubName));
                 let onboardingCli = new OnboardingCli();
                 onboardingCli.doOnboarding(answers.hubPackage).then(info => {
                     let configData = helpers.createConfigData(answers.hubName, answers.hubPackage, info);
@@ -90,7 +91,7 @@ class MainController extends BaseController {
 
         inquirer.prompt(questions).then(function (results) {
             let onboardingCli = new OnboardingCli();
-            let fileName = helpers.createOnboardingFileName(results.hubPackage);
+            let fileName = path.join(configRoot, helpers.createOnboardingFileName(results.hubPackage));
             helpers.readFile(fileName, "Please complete onboarding").then(data => {
                 let configInfo = JSON.parse(data);
                 let authInfo = configInfo.authInfo;
@@ -134,7 +135,7 @@ class MainController extends BaseController {
 
         inquirer.prompt(questions).then(function (answers) {
             let hub = { name: answers.hubName };
-            let fileName = helpers.createOnboardingFileName(hub.name);
+            let fileName = path.join(configRoot, helpers.createOnboardingFileName(hub.name));
             helpers.readFile(fileName, "Please complete onboarding").then(data => {
                 let configInfo = JSON.parse(data);
                 hub.deviceInfo = configInfo.authInfo;

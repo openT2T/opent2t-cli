@@ -17,16 +17,12 @@ Get your dev environment set up (PC or Mac):
 * [Install Node](https://nodejs.org/en/download/)
 * Choose your favorite IDE, e.g. [Visual Studio Code](https://code.visualstudio.com/).
 
-Clone the CLI repo
+Install the CLI module
+
+> The CLI does not currently support global installation
 
 ```bash
-$ git clone https://github.com/openT2T/opent2t-cli.git
-```
-
-Install the CLI's dependencies
-
-```bash
-$ npm install
+$ npm install opent2t-cli
 ```
 
 ## Run a Translator Locally
@@ -39,7 +35,7 @@ npm install opent2t-translator-com-wink-thermostat
 ```
 2. First step is to do the onboarding. Wink communicates via the hub so you need to set that up first
 ```bash
-node index.js -o opent2t-translator-com-wink-hub -h WinkHub
+node_modules\.bin\opent2t-cli -o opent2t-translator-com-wink-hub -h WinkHub
 ```
 
 You'll be prompted for some info:
@@ -59,7 +55,7 @@ After this, your access token info has been saved so you should not have to do t
 
 3. Enumerate devices on the hub and find the device id you want to use (in this case the thermostat)
 ```bash
-node index.js -h WinkHub
+node_modules\.bin\opent2t-cli -h WinkHub
 ```
 This will print out the devices that the hub sees and also creates json files so the cli can use this info later.
 
@@ -70,7 +66,7 @@ This will print out the devices that the hub sees and also creates json files so
 
 4. Get the thermostat info
 ```bash
-node index.js -h WinkHub -t opent2t-translator-com-wink-thermostat -i 152846 -g ThermostatResURI
+node_modules\.bin\opent2t-cli -h WinkHub -t opent2t-translator-com-wink-thermostat -i 152846 -g ThermostatResURI
 ```
 Let's break this call down:
 * -h is the hub you're communicating through
@@ -81,7 +77,7 @@ Let's break this call down:
 ## Run the CLI in interactive mode
 
 ```bash
-node index.js -m
+node_modules\.bin\opent2t-cli -m
 ```
 
 You can run the CLI in interactive mode for a more guided experience.  In interactive mode you will be given menu prompts to perform common tasks such as:
@@ -92,16 +88,10 @@ You can run the CLI in interactive mode for a more guided experience.  In intera
 
 ## Run the graphical reference application
 
-Install electron globally
-
-```bash
-$ npm install –g electron
-```
-
 Launch the reference application
 
 ```bash
-electron .\reference-app\main.js
+node_modules\.bin\opent2t-ui
 ```
 
 ### From here you can:

@@ -3,7 +3,7 @@
   "description": "opent2t reference app",
   "main": "main.js",
   "authors": [
-    "Chuck Ferring <chuckfer@microsoft.com>"
+    "opent2t"
   ],
   "license": "ISC",
   "homepage": "",

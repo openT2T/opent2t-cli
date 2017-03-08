@@ -9,11 +9,13 @@ var colors = require('colors');
 var OnboardingCli = require("./onboardingCli");
 var TranslatorCli = require("./translatorCli");
 var fs = require('fs');
+var path = require('path');
 var inquirer = require('inquirer');
 var q = require('q');
 var helpers = require('./helpers');
 var translatorCli = new TranslatorCli();
 var MainController = require("./controllers/mainController");
+var configRoot = path.join(__dirname, './');
 
 // set theme 
 colors.setTheme({
@@ -52,7 +54,7 @@ else if (program.onboarding) {
 
     console.log("------ Doing onboarding for %j".header, program.onboarding);
 
-    var fileName = helpers.createOnboardingFileName(program.hub);
+    let fileName = path.join(configRoot, helpers.createOnboardingFileName(program.hub));
 
     var onboardingCli = new OnboardingCli();
     onboardingCli.doOnboarding(program.onboarding).then(info => {
@@ -81,12 +83,12 @@ else if (program.translator && program.hub) {
         return;
     }
 
-    var fileName = helpers.createOnboardingFileName(program.hub);
+    let fileName = path.join(configRoot, helpers.createOnboardingFileName(program.hub));
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => {
         var configInfo = JSON.parse(data);
         var deviceInfo = configInfo.authInfo;
         translatorCli.createTranslator(configInfo.translatorPackageName, deviceInfo).then(hub => {
-            var fileName = helpers.createHubDeviceFileName(program.translator, program.id);
+            var fileName = path.join(configRoot, helpers.createHubDeviceFileName(program.translator, program.id));
             console.log(fileName);
             helpers.readFile(fileName, "Please complete hub -h before calling -t").then(data => {
                 var deviceInfo = JSON.parse(data);
@@ -131,13 +133,13 @@ else if (program.translator && program.hub) {
 else if (program.hub) {
     console.log("------ Hub enumerate devices for %j".header, program.hub);
 
-    var fileName = helpers.createOnboardingFileName(program.hub);
+    let fileName = path.join(configRoot, helpers.createOnboardingFileName(program.hub));
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => {
         var configInfo = JSON.parse(data);
         var deviceInfo = configInfo.authInfo;
         translatorCli.getProperty(configInfo.translatorPackageName, deviceInfo, 'getPlatforms').then(info => {
             helpers.logObject(info);
-            helpers.writeArrayToFile(info.platforms, "_device_", "controlId");
+            helpers.writeArrayToFile(info.platforms, configRoot, "_device_", "controlId");
         }).catch(error => {
             helpers.logError(error);
         });
@@ -148,7 +150,7 @@ else if (program.hub) {
 else if (program.refreshAuthToken) {
     console.log("------ Refreshing oAuth token for hub %j".header, program.refreshAuthToken);
     var onboardingCli = new OnboardingCli();
-    var fileName = helpers.createOnboardingFileName(program.refreshAuthToken);
+    let fileName = path.join(configRoot, helpers.createOnboardingFileName(program.refreshAuthToken));
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => {
         let configInfo = JSON.parse(data);
         let authInfo = configInfo.authInfo;
