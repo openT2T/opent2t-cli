@@ -4,12 +4,12 @@ var q = require('q');
 var fs = require('fs');
 var glob = require("glob");
 var path = require('path');
-var OpenT2T = require('opent2t').OpenT2T;
-var OnboardingCli = require("../onboardingCli");
+var Opent2tHelper = require("../Opent2tHelper");
+var opent2tHelper = new Opent2tHelper();
 var helpers = require('../helpers');
 var BaseController = require("./baseController");
 var HubController = require("./hubController");
-var configRoot = path.join(__dirname, '../');
+var configRoot = process.cwd();
 
 class MainController extends BaseController {
     constructor() {
@@ -50,8 +50,7 @@ class MainController extends BaseController {
         inquirer.prompt(questions).then(function (answers) {
             if (MainController.knownHubs.indexOf(answers.hubName) === -1) {
                 let fileName = path.join(configRoot, helpers.createOnboardingFileName(answers.hubName));
-                let onboardingCli = new OnboardingCli();
-                onboardingCli.doOnboarding(answers.hubPackage).then(info => {
+                opent2tHelper.doOnboarding(answers.hubPackage).then(info => {
                     let configData = helpers.createConfigData(answers.hubName, answers.hubPackage, info);
                     let data = JSON.stringify(configData);
                     fs.writeFile(fileName, data, function (err) {
@@ -90,14 +89,13 @@ class MainController extends BaseController {
         ];
 
         inquirer.prompt(questions).then(function (results) {
-            let onboardingCli = new OnboardingCli();
             let fileName = path.join(configRoot, helpers.createOnboardingFileName(results.hubPackage));
             helpers.readFile(fileName, "Please complete onboarding").then(data => {
                 let configInfo = JSON.parse(data);
                 let authInfo = configInfo.authInfo;
-                onboardingCli.loadTranslatorAndGetOnboardingAnswers(configInfo.translatorPackageName).then(answers => {
-                    OpenT2T.createTranslatorAsync(configInfo.translatorPackageName, authInfo).then(translator => {
-                        OpenT2T.invokeMethodAsync(translator, "", 'refreshAuthToken', [answers]).then(refreshedInfo => {
+                opent2tHelper.loadTranslatorAndGetOnboardingAnswers(configInfo.translatorPackageName).then(answers => {
+                    opent2tHelper.OpenT2T.createTranslatorAsync(configInfo.translatorPackageName, authInfo).then(translator => {
+                        opent2tHelper.OpenT2T.invokeMethodAsync(translator, "", 'refreshAuthToken', [answers]).then(refreshedInfo => {
                             let configData = helpers.createConfigData(configInfo.translator, configInfo.translatorPackageName, refreshedInfo);
                             let refreshedData = JSON.stringify(configData);
                             fs.writeFile(fileName, refreshedData, function (err) {
@@ -139,9 +137,9 @@ class MainController extends BaseController {
             helpers.readFile(fileName, "Please complete onboarding").then(data => {
                 let configInfo = JSON.parse(data);
                 hub.deviceInfo = configInfo.authInfo;
-                OpenT2T.createTranslatorAsync(configInfo.translatorPackageName, hub.deviceInfo).then(translator => {
+                opent2tHelper.OpenT2T.createTranslatorAsync(configInfo.translatorPackageName, hub.deviceInfo).then(translator => {
                     hub.translator = translator;
-                    OpenT2T.invokeMethodAsync(translator, "", 'getPlatforms', []).then(info => {
+                    opent2tHelper.OpenT2T.invokeMethodAsync(translator, "", 'getPlatforms', []).then(info => {
                         hub.platforms = info.platforms;
                         hub.devices = [];
                         for (var i = 0; i < info.platforms.length; i++) {

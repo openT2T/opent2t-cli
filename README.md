@@ -19,10 +19,14 @@ Get your dev environment set up (PC or Mac):
 
 Install the CLI module
 
-> The CLI does not currently support global installation
-
 ```bash
 $ npm install opent2t-cli
+```
+
+Or, to install globally
+
+```bash
+$ npm install -g opent2t-cli
 ```
 
 ## Run a Translator Locally
@@ -36,6 +40,12 @@ npm install opent2t-translator-com-wink-thermostat
 2. First step is to do the onboarding. Wink communicates via the hub so you need to set that up first
 ```bash
 node_modules\.bin\opent2t-cli -o opent2t-translator-com-wink-hub -h WinkHub
+```
+
+Or, if installed globally
+
+```bash
+opent2t-cli -o opent2t-translator-com-wink-hub -h WinkHub
 ```
 
 You'll be prompted for some info:
@@ -57,6 +67,13 @@ After this, your access token info has been saved so you should not have to do t
 ```bash
 node_modules\.bin\opent2t-cli -h WinkHub
 ```
+
+Or, if installed globally
+
+```bash
+opent2t-cli -h WinkHub
+```
+
 This will print out the devices that the hub sees and also creates json files so the cli can use this info later.
 
 ```bash
@@ -68,6 +85,13 @@ This will print out the devices that the hub sees and also creates json files so
 ```bash
 node_modules\.bin\opent2t-cli -h WinkHub -t opent2t-translator-com-wink-thermostat -i 152846 -g ThermostatResURI
 ```
+
+Or, if installed globally
+
+```bash
+opent2t-cli -h WinkHub -t opent2t-translator-com-wink-thermostat -i 152846 -g ThermostatResURI
+```
+
 Let's break this call down:
 * -h is the hub you're communicating through
 * -t is the device type you want to talk to
@@ -78,6 +102,12 @@ Let's break this call down:
 
 ```bash
 node_modules\.bin\opent2t-cli -m
+```
+
+Or, if installed globally
+
+```bash
+opent2t-cli -m
 ```
 
 You can run the CLI in interactive mode for a more guided experience.  In interactive mode you will be given menu prompts to perform common tasks such as:
@@ -92,6 +122,12 @@ Launch the reference application
 
 ```bash
 node_modules\.bin\opent2t-ui
+```
+
+Or, if installed globally
+
+```bash
+opent2t-ui
 ```
 
 ### From here you can:

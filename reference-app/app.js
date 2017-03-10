@@ -2,7 +2,6 @@ var mainModule = angular.module('mainModule', ['ui.slider', 'angularResizable'])
 
 mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', function ($scope, $http, $q, remote, config) {
 
-    $scope.opent2t = require('opent2t').OpenT2T;
     $scope.config = config;
     $scope.remoteApp = remote.app;
     $scope.onboardingMap = {};
@@ -28,10 +27,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     }
 
     $scope.loadOnboardingInfo = function () {
-        var LocalPackageSourceClass = require('opent2t/package/LocalPackageSource').LocalPackageSource;
-        var localPackageSource = new LocalPackageSourceClass("./node_modules");
-
-        return localPackageSource.getAllPackageInfoAsync().then((packages) => {
+        return $scope.remoteApp.getPackageInfo().then((packages) => {
 
             // default use the first package
             var p = packages[0];

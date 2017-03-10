@@ -5,16 +5,15 @@ var q = require('q');
 var fs = require('fs');
 var glob = require('glob');
 var path = require('path');
-var rootPath = path.join(__dirname, '..');
-var Opent2tHelper = require("./Opent2tHelper");
+var rootPath = process.cwd();
+var Opent2tHelper = require("../Opent2tHelper");
 var opent2tHelper = new Opent2tHelper();
 var helpers = require('../helpers');
-var findup = require('findup-sync');
 
 // Uncomment the following line during development to get automatic updating.
 // require('electron-reload')(__dirname);
 
-var modulesRoot = findup('node_modules');
+var modulesRoot = path.join(rootPath, '/node_modules/');
 
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -52,6 +51,10 @@ app.on('ready', function () {
         mainWindow = null;
     });
 });
+
+app.getPackageInfo = function() {
+    return opent2tHelper.getAllPackageInfo();
+}
 
 app.readFile = function (fileName) {
     let deferred = q.defer();
@@ -185,7 +188,7 @@ app.getProperty = function (hubName, thingInfo, deviceId, property) {
 app.initiateOnboarding = function (translatorName) {
     var deferred = q.defer();
 
-    opent2tHelper.getTranslatorInfo(path.join(modulesRoot, translatorName)).then(info => {
+    opent2tHelper.getTranslatorInfo(translatorName).then(info => {
         deferred.resolve(info);
     }).catch(error => {
         deferred.reject(error);
@@ -210,7 +213,7 @@ app.getUserPermission = function (onboardingInfo, flow, answers) {
 
 app.doOnboarding = function (name, translatorName, onboardingInfo, answers) {
     var deferred = q.defer();
-    let Onboarding = require(onboardingInfo);
+    let Onboarding = require(path.join(modulesRoot, onboardingInfo));
     let onboarding = new Onboarding();
 
     onboarding.onboard(answers).then(info => {

@@ -1,7 +1,8 @@
 'use strict';
 var inquirer = require('inquirer');
 var q = require('q');
-var OpenT2T = require('opent2t').OpenT2T;
+var Opent2tHelper = require("../Opent2tHelper");
+var opent2tHelper = new Opent2tHelper();
 var BaseController = require("./baseController");
 var DeviceController = require("./deviceController");
 
@@ -49,7 +50,7 @@ class HubController extends BaseController {
             let deviceInfo = state.currentHub.platforms.find(p => p.opent2t.controlId === device.id);
             let dInfo = { 'deviceInfo': deviceInfo, 'hub': state.currentHub.translator };
 
-            OpenT2T.createTranslatorAsync(device.translatorName, dInfo).then(translator => {
+            opent2tHelper.OpenT2T.createTranslatorAsync(device.translatorName, dInfo).then(translator => {
                 device.translator = translator;
                 device.properties = [];
                 device.readonlyProperties = [];
