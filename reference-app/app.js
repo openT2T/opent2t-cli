@@ -188,7 +188,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         let style = {};
 
         if(resource.rt[0] === 'oic.r.colour.rgb') {
-            let rgb = resource.rgbvalue;
+            let rgb = resource.rgbValue;
             if(rgb && rgb[0] !== null && rgb[1] !== null && rgb[2] !== null) {
                 style['background-color'] = `rgb(${Math.round(rgb[0])},${Math.round(rgb[1])},${Math.round(rgb[2])})`;
             }
@@ -258,11 +258,11 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     }
 
     $scope.setColourRgb = function (device, property) {
-        setDeviceProperty(device, property, { rgbvalue: [property.currentRed, property.currentGreen, property.currentBlue] }).then(info => {
-            property.rgbvalue = info.rgbvalue;
-            property.currentRed = property.rgbvalue[0];
-            property.currentGreen = property.rgbvalue[1];
-            property.currentBlue = property.rgbvalue[2];
+        setDeviceProperty(device, property, { rgbValue: [property.currentRed, property.currentGreen, property.currentBlue] }).then(info => {
+            property.rgbValue = info.rgbValue;
+            property.currentRed = property.rgbValue[0];
+            property.currentGreen = property.rgbValue[1];
+            property.currentBlue = property.rgbValue[2];
         }).catch(error => {
             logError(error);
         });
@@ -346,9 +346,9 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
                         resource.currentMode = resource.modes[0];
                     }
                     else if (resource.rt[0] === 'oic.r.colour.rgb') {
-                        resource.currentRed = resource.rgbvalue[0];
-                        resource.currentGreen = resource.rgbvalue[1];
-                        resource.currentBlue = resource.rgbvalue[2];
+                        resource.currentRed = resource.rgbValue[0];
+                        resource.currentGreen = resource.rgbValue[1];
+                        resource.currentBlue = resource.rgbValue[2];
                     }
                 }
 
