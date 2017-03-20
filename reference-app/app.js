@@ -51,7 +51,9 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
             $scope.loading = true;
             getHubData(hub).then(platforms => {
                 $scope.selectedHub = hub;
-                $scope.selectPlatform(platforms[0]);
+                $scope.selectPlatform(platforms.platforms[0]);
+                // Log any failed translators
+                logInfo(JSON.stringify(platforms.errors, null, 2));
             }).catch(error => {
                 $scope.loading = false;
                 logError(error);
@@ -65,13 +67,15 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         $scope.loading = true;
         getHubData($scope.selectedHub).then(platforms => {
             if (currentPlatformId) {
-                for (let i = 0; i < platforms.length; i++) {
-                    if (platforms[i].info.opent2t.controlId === currentPlatformId) {
-                        $scope.selectPlatform(platforms[i]);
+                for (let i = 0; i < platforms.platforms.length; i++) {
+                    if (platforms.platforms[i].info.opent2t.controlId === currentPlatformId) {
+                        $scope.selectPlatform(platforms.platforms[i]);
                         break;
                     }
                 }
             }
+            // Log any failed translators
+            logInfo(JSON.stringify(platforms.errors, null, 2));
         }).catch(error => {
             $scope.loading = false;
             logError(error);
@@ -357,7 +361,10 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
 
             $scope.hubData[hub.translatorPackageName] = platforms;
             $scope.loading = false;
-            deferred.resolve(platforms);
+            deferred.resolve({
+                platforms: platforms,
+                errors: info.errors
+            });
         }).catch(error => {
             deferred.reject(error);
         });
