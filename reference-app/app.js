@@ -11,9 +11,11 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     $scope.hubData = {};
     $scope.state = { currentOutput: '', showOutput: true, ready: false, busy: false };
     $scope.loadingMessage = '';
+    $scope.displayValues = {};
 
     // by default ensure loading screen shows on app launch
     $scope.loading = true;
+    $scope.loadonboarding = false;
     $scope.onboarding = false;
 
     $scope.loadData = function () {
@@ -126,13 +128,14 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
 
         $scope.getUserPermission(answers).then(answers => {
             $scope.loadingMessage = 'Completing Onboarding';
-            $scope.loading = true;
+            $scope.loadonboarding = true;
             $scope.remoteApp.doOnboarding($scope.hubName, $scope.hubPackageName, $scope.onboardingInfo.onboarding, answers).then(hub => {
                 $scope.configuredHubs.push(hub);
                 $scope.onboarding = false;
+                $scope.loadonboarding = false;
                 $scope.selectHub(hub);
             }).catch(error => {
-                $scope.loading = false;
+                $scope.loadonboarding = false;
                 logError(error);
                 $scope.$apply();
             });
@@ -150,13 +153,13 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         }
         else {
             $scope.loadingMessage = 'Getting User Permission';
-            $scope.loading = true;
+            $scope.loadonboarding = true;
             $scope.remoteApp.getUserPermission($scope.onboardingInfo.onboarding, $scope.onboardingUrl, answers).then(code => {
                 answers[$scope.onboardingUrl.index] = code;
-                $scope.loading = false;
+                $scope.loadonboarding = false;
                 deferred.resolve(answers);
             }).catch(error => {
-                $scope.loading = false;
+                $scope.loadonboarding = false;
                 logError(error);
                 $scope.$apply();
             });
@@ -167,6 +170,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
 
     $scope.cancelOnboarding = function () {
         clearLog();
+        $scope.loadonboarding = false;
         $scope.onboarding = false;
     }
 
@@ -254,11 +258,13 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     }
 
     $scope.setColourRgb = function (device, property) {
-        setDeviceProperty(device, property, { rgbValue: [property.currentRed, property.currentGreen, property.currentBlue] }).then(info => {
+        let controlId = device.info.opent2t.controlId;
+        let propVals = $scope.displayValues[`${controlId}_${property.id}`];
+        setDeviceProperty(device, property, { rgbValue: [propVals.currentRed, propVals.currentGreen, propVals.currentBlue] }).then(info => {
             property.rgbValue = info.rgbValue;
-            property.currentRed = property.rgbValue[0];
-            property.currentGreen = property.rgbValue[1];
-            property.currentBlue = property.rgbValue[2];
+            addDisplayValue(controlId, property.id, 'currentRed', property.rgbValue[0]);
+            addDisplayValue(controlId, property.id, 'currentGreen', property.rgbValue[1]);
+            addDisplayValue(controlId, property.id, 'currentBlue', property.rgbValue[2]);
         }).catch(error => {
             logError(error);
         });
@@ -272,10 +278,12 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         });
     }
 
-    $scope.setModeValue = function (device, property, value) {
-        setDeviceProperty(device, property, { modes: [value] }).then(info => {
+    $scope.setModeValue = function (device, property) {
+        let controlId = device.info.opent2t.controlId;
+        let propVals = $scope.displayValues[`${controlId}_${property.id}`];
+        setDeviceProperty(device, property, { modes: [propVals.currentMode] }).then(info => {
             property.modes = info.modes;
-            property.currentMode = property.modes[0];
+            addDisplayValue(controlId, property.id, 'currentMode', property.modes[0]);
         }).catch(error => {
             logError(error);
         });
@@ -327,6 +335,18 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         return deferred.promise;
     }
 
+    function addDisplayValue(controlId, resourceId, propertyName, value) {
+        let itemKey = `${controlId}_${resourceId}`;
+        let displayItem = $scope.displayValues[itemKey];
+
+        if(!displayItem) {
+            displayItem = {};
+            $scope.displayValues[itemKey] = displayItem;
+        }
+
+        displayItem[propertyName] = value;
+    }
+
     function getHubData(hub) {
         let deferred = $q.defer();
 
@@ -334,17 +354,18 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
             let platforms = [];
             for (var i = 0; i < info.platforms.length; i++) {
                 let platform = info.platforms[i];
+                let controlId = platform.opent2t.controlId;
 
                 //This is a workaround because angular doesn't handle binding to array elements well.
                 for (let j = 0; j < platform.entities[0].resources.length; j++) {
                     let resource = platform.entities[0].resources[j];
                     if (resource.rt[0] === 'oic.r.mode' && resource.modes !== undefined) {
-                        resource.currentMode = resource.modes[0];
+                        addDisplayValue(controlId, resource.id, 'currentMode', resource.modes[0]);
                     }
                     else if (resource.rt[0] === 'oic.r.colour.rgb') {
-                        resource.currentRed = resource.rgbValue[0];
-                        resource.currentGreen = resource.rgbValue[1];
-                        resource.currentBlue = resource.rgbValue[2];
+                        addDisplayValue(controlId, resource.id, 'currentRed', resource.rgbValue[0]);
+                        addDisplayValue(controlId, resource.id, 'currentGreen', resource.rgbValue[1]);
+                        addDisplayValue(controlId, resource.id, 'currentBlue', resource.rgbValue[2]);
                     }
                 }
 

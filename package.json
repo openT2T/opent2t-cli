@@ -24,7 +24,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "refapp": "electron reference-app"
+    "refapp": "electron reference-app",
+    "refapp-debug": "electron reference-app --debug"
   },
   "preferGlobal": true,
   "repository": {

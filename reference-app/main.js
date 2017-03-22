@@ -9,6 +9,8 @@ var rootPath = process.cwd();
 var Opent2tHelper = require("../Opent2tHelper");
 var opent2tHelper = new Opent2tHelper();
 var helpers = require('../helpers');
+var arguments = process.argv.slice(2);
+var debug = arguments.indexOf('--d') !== -1 || arguments.indexOf('--debug') !== -1;
 
 // Uncomment the following line during development to get automatic updating.
 // require('electron-reload')(__dirname);
@@ -40,8 +42,9 @@ app.on('ready', function () {
     // and load the app.html of the app.
     mainWindow.loadURL('file://' + __dirname + '/app.html');
 
-    // Uncomment this to see the browser developer tools.
-    // mainWindow.openDevTools();
+    if(debug) {
+        mainWindow.openDevTools();
+    }
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -199,39 +202,47 @@ app.initiateOnboarding = function (translatorName) {
 
 app.getUserPermission = function (onboardingInfo, flow, answers) {
     var deferred = q.defer();
-    let Onboarding = require(onboardingInfo);
-    let onboarding = new Onboarding();
+    try {
+        let Onboarding = require(path.join(modulesRoot, onboardingInfo));
+        let onboarding = new Onboarding();
 
-    opent2tHelper.getUserPermission(onboarding, flow, answers).then(code => {
-        deferred.resolve(code);
-    }).catch(error => {
+        opent2tHelper.getUserPermission(onboarding, flow, answers).then(code => {
+            deferred.resolve(code);
+        }).catch(error => {
+            deferred.reject(error);
+        });
+    } catch (error) {
         deferred.reject(error);
-    });
+    }
 
     return deferred.promise;
 }
 
 app.doOnboarding = function (name, translatorName, onboardingInfo, answers) {
     var deferred = q.defer();
-    let Onboarding = require(path.join(modulesRoot, onboardingInfo));
-    let onboarding = new Onboarding();
+    try {
+        let Onboarding = require(path.join(modulesRoot, onboardingInfo));
+        let onboarding = new Onboarding();
 
-    onboarding.onboard(answers).then(info => {
-        name = helpers.sanitizeFileName(name);
-        let hubInfo = { translator: name, translatorPackageName: translatorName, authInfo: info };
-        let data = JSON.stringify(hubInfo);
-        let fileName = `${name}_onboardingInfo.json`;
-        fs.writeFile(path.join(rootPath, fileName), data, function (error) {
-            if (error) {
-                deferred.reject(error);
-            }
-            else {
-                deferred.resolve(hubInfo);
-            }
+        onboarding.onboard(answers).then(info => {
+            name = helpers.sanitizeFileName(name);
+            let hubInfo = { translator: name, translatorPackageName: translatorName, authInfo: info };
+            let data = JSON.stringify(hubInfo);
+            let fileName = `${name}_onboardingInfo.json`;
+            fs.writeFile(path.join(rootPath, fileName), data, function (error) {
+                if (error) {
+                    deferred.reject(error);
+                }
+                else {
+                    deferred.resolve(hubInfo);
+                }
+            });
+        }).catch(error => {
+            deferred.reject(error);
         });
-    }).catch(error => {
+    } catch (error) {
         deferred.reject(error);
-    });
+    }
 
     return deferred.promise;
 }
