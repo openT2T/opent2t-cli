@@ -272,24 +272,31 @@ class Opent2tHelper {
 
     // starts a web server at the configured port and waits for /success call
     doWebFlow(url) {
-        var deferred = q.defer();
-        var open = require('open');
-        var express = require('express');
-        var port = 8080;
-        var app = express();
+        let deferred = q.defer();
 
-        app.get("/success", function (req, res) {
+        let open = require('open');
+        let express = require('express');
+        let port = 8080;
+
+        if(!this.expresApp) {
+            this.expresApp = express();
+
+            this.expresApp.listen(port, function () {
+                console.log("Server running on port", port);
+                console.log("Waiting for success call from web page");
+            });
+        
+        }
+        else {
+            this.expresApp._router.stack.pop();
+        }
+
+        this.expresApp.get("/success", function (req, res) {
             res.send("success!");
-            helpers.logObject(req.url);
             deferred.resolve(req.url);
         });
 
-        app.listen(port, function () {
-            console.log("Server running on port", port);
-            console.log("Waiting for success call from web page");
-
-            open(url);
-        });
+        open(url);
 
         return deferred.promise;
     }
