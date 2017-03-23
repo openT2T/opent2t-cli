@@ -57,6 +57,18 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         }
     }
 
+    $scope.deleteHub = function (hub) {
+        $scope.remoteApp.removeHub(hub.translator).then(() => {
+            if(hub === $scope.selectedHub) {
+                $scope.selectedHub = undefined;
+                $scope.selectedPlatform = undefined;
+            }
+            let hubIndex = $scope.configuredHubs.indexOf(hub);
+            $scope.configuredHubs.splice(hubIndex, 1);
+            $scope.$apply();
+        });
+    }
+
     $scope.refreshHub = function () {
         let currentPlatformId = $scope.selectedPlatform === undefined ? undefined : $scope.selectedPlatform.info.opent2t.controlId;
         $scope.loadingMessage = 'Refreshing Hub Data';

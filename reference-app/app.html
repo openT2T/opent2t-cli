@@ -49,6 +49,14 @@
                                 <span class="fa fa-plus icon-button" title="Add Hub"></span>
                                 <span ng-if="configuredHubs.length === 0">Add a Hub</span>
                             </span>
+                            <div class="dropdown" style="display:inline-block" ng-if="configuredHubs.length > 0">
+                                <div class="hub-dropdown" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span class="fa fa-minus icon-button" title="Delete Hub"></span>
+                                </div>
+                                <ul class="dropdown-menu hub-menu" aria-labelledby="dropdownMenu2">
+                                    <li class="actionable hub-menu-item" ng-repeat="configuredHub in configuredHubs" ng-click="deleteHub(configuredHub)">{{configuredHub.translator}}</li>
+                                </ul>
+                            </div>
                             <span class="actionable header-icon" ng-click="refreshHub()" ng-if="selectedHub != undefined">
                                 <span class="fa fa-refresh icon-button" title="Refresh Hub Info"></span>
                                 <span ng-if="configuredHubs.length === 0">Add a Hub</span>

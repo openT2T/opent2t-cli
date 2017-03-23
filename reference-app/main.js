@@ -247,6 +247,23 @@ app.doOnboarding = function (name, translatorName, onboardingInfo, answers) {
     return deferred.promise;
 }
 
+app.removeHub = function (name) {
+    var deferred = q.defer();
+
+    let fileName = helpers.createOnboardingFileName(name);
+    
+    fs.unlink(path.join(rootPath, fileName), (err) => {
+        if (err) {
+            deferred.reject(err);
+        }
+        else {
+            deferred.resolve();
+        }
+    });
+
+    return deferred.promise;
+}
+
 function createHub(hubName) {
     let deferred = q.defer();
     let fileName = path.join(rootPath, `${hubName}_onboardingInfo.json`);
