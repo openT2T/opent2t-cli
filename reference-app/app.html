@@ -4,19 +4,19 @@
     <head>
         <title>{{ config.appTitle }}</title>
         <script type="text/javascript">
-            window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery.min.js');
+            window.$ = window.jQuery = require('./bower_components/jquery/dist/jquery.js');
         </script>
-        <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.min.css">
-        <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap-theme.min.css">
-        <link rel="stylesheet" href="../node_modules/angular-resizable/angular-resizable.min.css">
-        <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="bower_components/angular-resizable/angular-resizable.min.css">
+        <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
         <script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.js"></script>
         <script type="text/javascript" src="bower_components/jquery-ui/ui/widgets/slider.js"></script>
         <script type="text/javascript" src="bower_components/angular/angular.js"></script>
         <script type="text/javascript" src="bower_components/angular-ui-slider/src/slider.js"></script>
-        <script src="../node_modules/angular-resizable/angular-resizable.min.js"></script>
+        <script src="bower_components/angular-resizable/angular-resizable.min.js"></script>
         <script src="app.js"></script>
         <link href="css/app.css" rel="stylesheet" type="text/css" />
         <link href="css/controls.css" rel="stylesheet" type="text/css" />
@@ -49,6 +49,14 @@
                                 <span class="fa fa-plus icon-button" title="Add Hub"></span>
                                 <span ng-if="configuredHubs.length === 0">Add a Hub</span>
                             </span>
+                            <div class="dropdown" style="display:inline-block" ng-if="configuredHubs.length > 0">
+                                <div class="hub-dropdown" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span class="fa fa-minus icon-button" title="Delete Hub"></span>
+                                </div>
+                                <ul class="dropdown-menu hub-menu" aria-labelledby="dropdownMenu2">
+                                    <li class="actionable hub-menu-item" ng-repeat="configuredHub in configuredHubs" ng-click="deleteHub(configuredHub)">{{configuredHub.translator}}</li>
+                                </ul>
+                            </div>
                             <span class="actionable header-icon" ng-click="refreshHub()" ng-if="selectedHub != undefined">
                                 <span class="fa fa-refresh icon-button" title="Refresh Hub Info"></span>
                                 <span ng-if="configuredHubs.length === 0">Add a Hub</span>
@@ -104,10 +112,10 @@
                                             <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.humidity}}</span>
                                         </div>
                                         <div ng-if="resource.rt[0] === 'oic.r.mode'">
-                                            <select ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1" class="ct-value-select form-control" ng-model="resource.currentMode" ng-change="setModeValue(platform, resource, resource.currentMode)">"
+                                            <select ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1" class="ct-value-select form-control" ng-model="displayValues[platform.info.opent2t.controlId + '_' + resource.id].currentMode" ng-change="setModeValue(platform, resource)">"
                                                 <option ng-repeat="option in resource.supportedModes" value="{{option}}">{{option}}</option>
                                             </select>
-                                            <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.currentMode}}</span>
+                                            <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{displayValues[platform.info.opent2t.controlId + '_' + resource.id].currentMode}}</span>
                                         </div>
                                         <div ng-if="resource.rt[0] === 'oic.r.colour.chroma'">
                                             <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
@@ -120,9 +128,9 @@
                                         </div>
                                         <div ng-if="resource.rt[0] === 'oic.r.colour.rgb'">
                                             <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
-                                                <input class="ct-text-input ct-color-input form-control" ng-disabled="state.busy" type="text" ng-model="resource.currentRed">
-                                                <input class="ct-text-input ct-color-input form-control" ng-disabled="state.busy" type="text" ng-model="resource.currentGreen">
-                                                <input class="ct-text-input ct-color-input form-control" ng-disabled="state.busy" type="text" ng-model="resource.currentBlue">
+                                                <input class="ct-text-input ct-color-input form-control" ng-disabled="state.busy" type="text" ng-model="displayValues[platform.info.opent2t.controlId + '_' + resource.id].currentRed">
+                                                <input class="ct-text-input ct-color-input form-control" ng-disabled="state.busy" type="text" ng-model="displayValues[platform.info.opent2t.controlId + '_' + resource.id].currentGreen">
+                                                <input class="ct-text-input ct-color-input form-control" ng-disabled="state.busy" type="text" ng-model="displayValues[platform.info.opent2t.controlId + '_' + resource.id].currentBlue">
                                                 <div class="icon-button" title="Set" ng-click="state.busy || setColourRgb(platform, resource);">
                                                     <i class="fa fa-arrow-circle-right resource-button"></i>
                                                 </div>
@@ -209,29 +217,39 @@
 
                 <div class="otr-grid-cell-fit" ng-show="onboarding">
                     <div class="onboarding-container form-group">
-                        <div class="onboarding-question">
-                            <span class="onboarding-name">Hub Name
-                                <span class="onboarding-description">(e.g. Contoso Hub)</span>
-                            </span>
-                            <input class="onboarding-text-input form-control" type="text" ng-model="hubName">
-                        </div>
-                        <div class="onboarding-question">
-                            <span class="onboarding-name">Hub Package</span>
-                            <select class="form-control" ng-model="hubPackage" ng-disabled="onboardingPhase !== 1">
-                                <option ng-repeat="option in knownHubs" value="{{option}}">{{option}}</option>
-                            </select>
-                        </div>
-                        <div ng-if="onboardingPhase === 2">
-                            <div class="onboarding-question" ng-repeat="question in onboardingQuestions">
-                                <span class="onboarding-name">{{question.question}}</span>
-                                <input class="onboarding-text-input form-control" type="{{question.type === 'password' ? 'password' : 'text'}}" ng-model="question.answer">
+                        <div ng-show="!loadonboarding">
+                            <div class="onboarding-question">
+                                <span class="onboarding-name">Hub Name
+                                    <span class="onboarding-description">(e.g. Contoso Hub)</span>
+                                </span>
+                                <input class="onboarding-text-input form-control" type="text" ng-model="hubName">
+                            </div>
+                            <div class="onboarding-question">
+                                <span class="onboarding-name">Hub Package</span>
+                                <select class="form-control" ng-model="hubPackage" ng-disabled="onboardingPhase !== 1">
+                                    <option ng-repeat="option in knownHubs" value="{{option}}">{{option}}</option>
+                                </select>
+                            </div>
+                            <div ng-show="onboardingPhase === 2">
+                                <div class="onboarding-question" ng-repeat="question in onboardingQuestions">
+                                    <span class="onboarding-name">{{question.question}}</span>
+                                    <input class="onboarding-text-input form-control" type="{{question.type === 'password' ? 'password' : 'text'}}" ng-model="question.answer">
+                                </div>
                             </div>
                         </div>
+
+                        <div class="loading-message" ng-show="loadonboarding">
+                            <div>{{loadingMessage}}</div>
+                            <div>
+                                <i class="fa fa-refresh fa-spin"></i>
+                            </div>
+                        </div>
+
                         <div class="onboarding-controls">
-                            <label ng-disabled="!hubName || !hubPackage" class="btn btn-default" ng-if="onboardingPhase === 1" ng-click="startOnboarding(hubPackage)">
+                            <label ng-disabled="!hubName || !hubPackage" class="btn btn-default" ng-show="!loadonboarding && onboardingPhase === 1" ng-click="startOnboarding(hubPackage)">
                                 <span>Start Onboarding</span>
                             </label>
-                            <label class="btn btn-default" ng-if="onboardingPhase === 2" ng-click="completeOnboarding()">
+                            <label class="btn btn-default" ng-show="!loadonboarding && onboardingPhase === 2" ng-click="completeOnboarding()">
                                 <span>Complete Onboarding</span>
                             </label>
                             <label class="btn btn-default" ng-click="cancelOnboarding()">
