@@ -104,7 +104,7 @@ app.getKnownHubs = function () {
 
 app.loadDevices = function (hubName) {
     let deferred = q.defer();
-    let fileName = path.join(rootPath, `${hubName}_onboardingInfo.json`);
+    let fileName = path.join(rootPath, helpers.createOnboardingFileName(hubName));
 
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => {
         let configInfo = JSON.parse(data);
@@ -228,7 +228,7 @@ app.doOnboarding = function (name, translatorName, onboardingInfo, answers) {
             name = helpers.sanitizeFileName(name);
             let hubInfo = { translator: name, translatorPackageName: translatorName, authInfo: info };
             let data = JSON.stringify(hubInfo);
-            let fileName = `${name}_onboardingInfo.json`;
+            let fileName = helpers.createOnboardingFileName(name);
             fs.writeFile(path.join(rootPath, fileName), data, function (error) {
                 if (error) {
                     deferred.reject(error);
@@ -266,7 +266,7 @@ app.removeHub = function (name) {
 
 function createHub(hubName) {
     let deferred = q.defer();
-    let fileName = path.join(rootPath, `${hubName}_onboardingInfo.json`);
+    let fileName = path.join(rootPath, helpers.createOnboardingFileName(hubName));
 
     helpers.readFile(fileName, "Please complete onboarding -o").then(data => {
         let configInfo = JSON.parse(data);
