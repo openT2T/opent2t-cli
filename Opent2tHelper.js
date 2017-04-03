@@ -9,7 +9,14 @@ var path = require('path');
 class Opent2tHelper {
     constructor() {
         this.modulesPath = path.join(process.cwd(), '/node_modules/');
-        this.OpenT2T = require(path.join(this.modulesPath, 'opent2t')).OpenT2T;
+        let opent2t = require(path.join(this.modulesPath, 'opent2t'));
+        this.logger = new opent2t.Logger("info");
+        this.OpenT2T = new opent2t.OpenT2T(this.logger);
+    }
+
+    createOnboarder(module) {
+        let Onboarding = require(path.join(this.modulesPath, module));
+        return new Onboarding(this.logger);
     }
 
     invokeDeviceMethod(translatorName, deviceInfo, methodName, params) {
@@ -155,7 +162,7 @@ class Opent2tHelper {
                 console.log("-----------------------------");
 
                 var Onboarding = require(path.join(this.modulesPath, tinfo.onboarding));
-                var onboarding = new Onboarding();
+                var onboarding = new Onboarding(this.logger);
                 return this.performFlow(onboarding, tinfo.onboardingFlow).then(answers => {
                     return onboarding.onboard(answers);
                 });
