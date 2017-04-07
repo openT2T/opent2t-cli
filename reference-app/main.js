@@ -17,7 +17,6 @@ var debug = arguments.indexOf('--d') !== -1 || arguments.indexOf('--debug') !== 
 
 var modulesRoot = path.join(rootPath, '/node_modules/');
 
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is GCed.
 var mainWindow = null;
@@ -203,8 +202,7 @@ app.initiateOnboarding = function (translatorName) {
 app.getUserPermission = function (onboardingInfo, flow, answers) {
     var deferred = q.defer();
     try {
-        let Onboarding = require(path.join(modulesRoot, onboardingInfo));
-        let onboarding = new Onboarding();
+        let onboarding = opent2tHelper.createOnboarder(onboardingInfo);
 
         opent2tHelper.getUserPermission(onboarding, flow, answers).then(code => {
             deferred.resolve(code);
@@ -221,8 +219,7 @@ app.getUserPermission = function (onboardingInfo, flow, answers) {
 app.doOnboarding = function (name, translatorName, onboardingInfo, answers) {
     var deferred = q.defer();
     try {
-        let Onboarding = require(path.join(modulesRoot, onboardingInfo));
-        let onboarding = new Onboarding();
+        let onboarding = opent2tHelper.createOnboarder(onboardingInfo);
 
         onboarding.onboard(answers).then(info => {
             name = helpers.sanitizeFileName(name);

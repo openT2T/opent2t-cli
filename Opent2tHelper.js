@@ -9,14 +9,21 @@ var path = require('path');
 class Opent2tHelper {
     constructor() {
         this.modulesPath = path.join(process.cwd(), '/node_modules/');
-        this.OpenT2T = require(path.join(this.modulesPath, 'opent2t')).OpenT2T;
+        let OpenT2T = require(path.join(this.modulesPath, 'opent2t'));
+        this.logger = new OpenT2T.Logger("info");
+        this.opent2t = new OpenT2T.OpenT2T(this.logger);
+    }
+
+    createOnboarder(module) {
+        let Onboarding = require(path.join(this.modulesPath, module));
+        return new Onboarding(this.logger);
     }
 
     invokeDeviceMethod(translatorName, deviceInfo, methodName, params) {
         let deferred = q.defer();
 
         this.createTranslator(translatorName, deviceInfo).then(translator => {
-            this.OpenT2T.invokeMethodAsync(translator, "", methodName, params).then(info => {
+            this.opent2t.invokeMethodAsync(translator, "", methodName, params).then(info => {
                 deferred.resolve(info);
             }).catch(error => {
                 deferred.reject(error);
@@ -32,7 +39,7 @@ class Opent2tHelper {
         let deferred = q.defer();
 
         this.createTranslator(translatorName, deviceInfo).then(translator => {
-            this.OpenT2T.invokeMethodAsync(translator, "", property, [value]).then(data => {
+            this.opent2t.invokeMethodAsync(translator, "", property, [value]).then(data => {
                 deferred.resolve(data);
             }).catch(error => {
                 deferred.reject(error);
@@ -48,7 +55,7 @@ class Opent2tHelper {
         let deferred = q.defer();
 
         this.createTranslator(translatorName, deviceInfo).then(translator => {
-            this.OpenT2T.invokeMethodAsync(translator, "", property, [deviceId, value]).then(data => {
+            this.opent2t.invokeMethodAsync(translator, "", property, [deviceId, value]).then(data => {
                 deferred.resolve(data);
             }).catch(error => {
                 deferred.reject(error);
@@ -63,7 +70,7 @@ class Opent2tHelper {
     createTranslator(translatorName, deviceInfo) {
         let deferred = q.defer();
 
-        this.OpenT2T.createTranslatorAsync(translatorName, deviceInfo).then(translator => {
+        this.opent2t.createTranslatorAsync(translatorName, deviceInfo).then(translator => {
             deferred.resolve(translator);
         }).catch(error => {
             deferred.reject(error);
@@ -155,7 +162,7 @@ class Opent2tHelper {
                 console.log("-----------------------------");
 
                 var Onboarding = require(path.join(this.modulesPath, tinfo.onboarding));
-                var onboarding = new Onboarding();
+                var onboarding = new Onboarding(this.logger);
                 return this.performFlow(onboarding, tinfo.onboardingFlow).then(answers => {
                     return onboarding.onboard(answers);
                 });
