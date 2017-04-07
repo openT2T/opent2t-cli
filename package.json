@@ -1,6 +1,6 @@
 {
   "name": "opent2t-cli",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Command Line Interface (CLI) and reference app for Open Translators to Things.",
   "bin": {
     "opent2t-cli": "./index.js",
