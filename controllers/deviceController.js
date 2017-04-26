@@ -64,7 +64,7 @@ class DeviceController extends BaseController {
         inquirer.prompt(questions).then(function (answers) {
             let prop = state.currentDevice.properties.find(p => p.name === answers.propName);
             let method = 'getDevices' + prop.name.charAt(0).toUpperCase() + prop.name.slice(1);
-            opent2tHelper.OpenT2T.invokeMethodAsync(state.currentDevice.translator, "", method, [prop.deviceId]).then(info => {
+            opent2tHelper.opent2t.invokeMethodAsync(state.currentDevice.translator, "", method, [prop.deviceId]).then(info => {
                 helpers.logObject(info);
                 deferred.resolve(state);
             }).catch(error => {
@@ -98,7 +98,7 @@ class DeviceController extends BaseController {
             let method = 'postDevices' + prop.name.charAt(0).toUpperCase() + prop.name.slice(1);
             try {
                 let parsedValue = JSON.parse(answers.value);
-                opent2tHelper.OpenT2T.invokeMethodAsync(state.currentDevice.translator, "", method, [prop.deviceId, parsedValue]).then(info => {
+                opent2tHelper.opent2t.invokeMethodAsync(state.currentDevice.translator, "", method, [prop.deviceId, parsedValue]).then(info => {
                     helpers.logObject(info);
                     deferred.resolve(state);
                 }).catch(error => {
@@ -132,7 +132,7 @@ class DeviceController extends BaseController {
         inquirer.prompt(questions).then(function (answers) {
             try {
                 let parsedParams = JSON.parse(answers.params);
-                opent2tHelper.OpenT2T.invokeMethodAsync(state.currentDevice.translator, "", answers.methodName, parsedParams).then(info => {
+                opent2tHelper.opent2t.invokeMethodAsync(state.currentDevice.translator, "", answers.methodName, parsedParams).then(info => {
                     helpers.logObject(info);
                     deferred.resolve(state);
                 }).catch(error => {
