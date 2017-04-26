@@ -94,8 +94,8 @@ class MainController extends BaseController {
                 let configInfo = JSON.parse(data);
                 let authInfo = configInfo.authInfo;
                 opent2tHelper.loadTranslatorAndGetOnboardingAnswers(configInfo.translatorPackageName).then(answers => {
-                    opent2tHelper.OpenT2T.createTranslatorAsync(configInfo.translatorPackageName, authInfo).then(translator => {
-                        opent2tHelper.OpenT2T.invokeMethodAsync(translator, "", 'refreshAuthToken', [answers]).then(refreshedInfo => {
+                    opent2tHelper.opent2t.createTranslatorAsync(configInfo.translatorPackageName, authInfo).then(translator => {
+                        opent2tHelper.opent2t.invokeMethodAsync(translator, "", 'refreshAuthToken', [answers]).then(refreshedInfo => {
                             let configData = helpers.createConfigData(configInfo.translator, configInfo.translatorPackageName, refreshedInfo);
                             let refreshedData = JSON.stringify(configData);
                             fs.writeFile(fileName, refreshedData, function (err) {
@@ -137,9 +137,9 @@ class MainController extends BaseController {
             helpers.readFile(fileName, "Please complete onboarding").then(data => {
                 let configInfo = JSON.parse(data);
                 hub.deviceInfo = configInfo.authInfo;
-                opent2tHelper.OpenT2T.createTranslatorAsync(configInfo.translatorPackageName, hub.deviceInfo).then(translator => {
+                opent2tHelper.opent2t.createTranslatorAsync(configInfo.translatorPackageName, hub.deviceInfo).then(translator => {
                     hub.translator = translator;
-                    opent2tHelper.OpenT2T.invokeMethodAsync(translator, "", 'getPlatforms', []).then(info => {
+                    opent2tHelper.opent2t.invokeMethodAsync(translator, "", 'getPlatforms', []).then(info => {
                         hub.platforms = info.platforms;
                         hub.devices = [];
                         for (var i = 0; i < info.platforms.length; i++) {
