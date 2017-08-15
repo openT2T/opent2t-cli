@@ -90,9 +90,25 @@
                                             <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.value}}</span>
                                         </div>
                                         <div class="dim-percentage" ng-if="resource.rt[0] === 'oic.r.light.dimming'">
-                                            <div class="ct-value-text">{{resource.dimmingSetting}}%</div>
+                                            <div class="ct-value-text">{{resource.dimmingSetting}}</div>
                                             <div ui-slider class="ct-slider" ng-disabled="state.busy" ng-if="resource.if.indexOf('oic.if.a') !== -1" min="{{resource.range[0]}}" max="{{resource.range[1]}}" ng-model="resource.dimmingSetting" ng-mouseup="state.busy || setDimmingValue(platform, resource, resource.dimmingSetting)"></div>
                                         </div>
+                                        <div class="ct-resources" ng-if="resource.rt[0] === 'org.opent2t.r.light.dimming'">
+                                            <div ui-slider class="ct-slider" ng-disabled="state.busy" ng-if="resource.if.indexOf('oic.if.a') !== -1" min="0" max="100" ng-model="resource.dimmingSetPercentage" ng-mouseup="state.busy || dimmingSetPercentage(platform, resource, resource.dimmingSetPercentage)"></div>
+                                               <div class="ct-value-text">{{resource.dimmingSetPercentage}}%</div>
+                                             <div class="dim-control">+
+                                                <input class="ct-text-input form-control" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1" min="0" max="100" type="number" name="input" ng-model="resource.dimmingIncrementPercentage">
+                                                <div class="icon-button" title="Set" ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-click="state.busy || dimmingIncrementPercentage(platform, resource, resource.dimmingIncrementPercentage);">
+                                                    <i class="fa fa-arrow-circle-right resource-button"></i>
+                                                </div>
+                                            </div>
+                                            <div class="dim-control">-
+                                                <input class="ct-text-input form-control" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1" min="0" max="100" type="number" name="input" ng-model="resource.dimmingDecrementPercentage">
+                                                <div class="icon-button" title="Set" ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-click="state.busy || dimmingDecrementPercentage(platform, resource, resource.dimmingDecrementPercentage);">
+                                                    <i class="fa fa-arrow-circle-right resource-button"></i>
+                                                </div>
+                                            </div>
+                                         </div>
                                         <div ng-if="resource.rt[0] === 'oic.r.temperature'">
                                             <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
                                                 <input class="ct-text-input form-control" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1" type="number" name="input" ng-model="resource.temperature">

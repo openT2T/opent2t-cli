@@ -61,7 +61,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
 
     $scope.deleteHub = function (hub) {
         $scope.remoteApp.removeHub(hub.translator).then(() => {
-            if(hub === $scope.selectedHub) {
+            if (hub === $scope.selectedHub) {
                 $scope.selectedHub = undefined;
                 $scope.selectedPlatform = undefined;
             }
@@ -203,9 +203,9 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     $scope.getResourceStyle = function(resource) {
         let style = {};
 
-        if(resource.rt[0] === 'oic.r.colour.rgb') {
+        if (resource.rt[0] === 'oic.r.colour.rgb') {
             let rgb = resource.rgbValue;
-            if(rgb && rgb[0] !== null && rgb[1] !== null && rgb[2] !== null) {
+            if (rgb && rgb[0] !== null && rgb[1] !== null && rgb[2] !== null) {
                 style['background-color'] = `rgb(${Math.round(rgb[0])},${Math.round(rgb[1])},${Math.round(rgb[2])})`;
             }
         }
@@ -257,6 +257,31 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         });
     }
 
+    $scope.dimmingSetPercentage = function (device, property, value) {
+        setDeviceProperty(device, property, { dimmingSetPercentage: value }).then(info => {
+            property.dimmingSetPercentage = info.dimmingSetPercentage;
+        }).catch(error => {
+            logError(error);
+        });
+    }
+
+    $scope.dimmingIncrementPercentage = function (device, property, value) {
+        setDeviceProperty(device, property, { dimmingIncrementPercentage: value }).then(info => {
+            property.dimmingIncrementPercentage = info.dimmingIncrementPercentage;
+            property.dimmingSetPercentage = info.dimmingSetPercentage;
+        }).catch(error => {
+            logError(error);
+        });
+    }
+
+    $scope.dimmingDecrementPercentage = function (device, property, value) {
+        setDeviceProperty(device, property, { dimmingDecrementPercentage: value }).then(info => {
+            property.dimmingDecrementPercentage = info.dimmingDecrementPercentage;
+            property.dimmingSetPercentage = info.dimmingSetPercentage;
+        }).catch(error => {
+            logError(error);
+        });
+    }
     $scope.setTemperatureValue = function (device, property, value) {
         setDeviceProperty(device, property, { temperature: value, units: property.units }).then(info => {
             property.temperature = info.temperature;
@@ -355,7 +380,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         let itemKey = `${controlId}_${resourceId}`;
         let displayItem = $scope.displayValues[itemKey];
 
-        if(!displayItem) {
+        if (!displayItem) {
             displayItem = {};
             $scope.displayValues[itemKey] = displayItem;
         }
