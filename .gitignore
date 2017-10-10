@@ -11,3 +11,4 @@ logs
 *_device_*.json
 *_onboardingInfo*.json
 .vscode/
+.idea/
