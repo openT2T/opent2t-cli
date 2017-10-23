@@ -376,6 +376,14 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         return deferred.promise;
     }
 
+    $scope.setScene = function (device, property) {
+        setDeviceProperty(device, property, false).then(info => {
+            property.value = false;
+        }).catch(error => {
+            logError(error);
+        });
+    }
+
     function addDisplayValue(controlId, resourceId, propertyName, value) {
         let itemKey = `${controlId}_${resourceId}`;
         let displayItem = $scope.displayValues[itemKey];
