@@ -28,6 +28,7 @@ program
     .option('-o --onboarding [Translator Package Name]', 'Do onboarding for specified thing')
     .option('-h --hub [Hub Name]', 'Gets devices for the given hub')
     .option('-r --refreshAuthToken [Translator Package Name]', 'Refresh the oauth token for the given hub')
+    .option('-x --deauthorizeToken [Translator Package Name]', 'Deauthorize the oauth token for the given hub')
 
     .option('-t --translator [Translator Package Name]', 'Do get property for specified thing, requires -p')
     .option('-i --id [Control id]', 'Control id you want to use')
@@ -165,6 +166,22 @@ else if (program.refreshAuthToken) {
                     console.log("Saved!");
                 });
 
+            }).catch(error => {
+                helpers.logError(error);
+            });
+        });
+    }).catch(error => {
+        helpers.logError(error);
+    });
+} else if (program.deauthorizeToken) {
+    console.log("------ Deauthorizing oAuth token for hub %j".header, program.deauthorizeToken);
+    let fileName = path.join(configRoot, helpers.createOnboardingFileName(program.deauthorizeToken));
+    helpers.readFile(fileName, "Please complete onboarding -o").then(data => {
+        let configInfo = JSON.parse(data);
+        let authInfo = configInfo.authInfo;
+        opent2tHelper.loadTranslatorAndGetOnboardingAnswers(configInfo.translatorPackageName).then(answers => {
+            opent2tHelper.getProperty(configInfo.translatorPackageName, authInfo, 'deauthorizeToken', answers).then(refreshedInfo => {
+                console.log("Deauthorized token.");
             }).catch(error => {
                 helpers.logError(error);
             });
