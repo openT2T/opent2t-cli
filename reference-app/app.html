@@ -122,16 +122,21 @@
                                         </div>
                                         <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.value}}</span>
                                     </div>
+
                                     <div ng-if="resource.rt[0] === 'oic.r.temperature'">
                                         <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
                                             <input class="ct-text-input form-control" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1" type="number"
                                                 name="input" ng-model="resource.temperature">
+                                                <select ng-model="resource.units" value="{{resource.units}}">
+                                                    <option ng-repeat="unit in ['', 'f', 'c']">{{unit}}</option>
+                                                </select>
                                             <div class="icon-button" title="Set" ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-click="state.busy || setTemperatureValue(platform, resource, resource.temperature);">
                                                 <i class="fa fa-arrow-circle-right resource-button"></i>
                                             </div>
                                         </div>
                                         <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.temperature}}</span>
                                     </div>
+
                                     <div ng-if="resource.rt[0] === 'oic.r.humidity'">
                                         <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
                                             <input class="ct-text-input form-control" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1" type="number"
