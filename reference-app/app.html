@@ -122,7 +122,6 @@
                                         </div>
                                         <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.value}}</span>
                                     </div>
-
                                     <div ng-if="resource.rt[0] === 'oic.r.temperature'">
                                         <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
                                             <input class="ct-text-input form-control" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1" type="number"
@@ -136,7 +135,6 @@
                                         </div>
                                         <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{resource.temperature}}</span>
                                     </div>
-
                                     <div ng-if="resource.rt[0] === 'oic.r.humidity'">
                                         <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
                                             <input class="ct-text-input form-control" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1" type="number"
