@@ -288,7 +288,6 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
             if (!!info.units) {
                 property.units = info.units;
             }
-            console.log(info);
         }).catch(error => {
             logError(error);
         });
