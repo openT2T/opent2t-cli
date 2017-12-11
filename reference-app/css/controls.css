@@ -39,6 +39,11 @@ small {
     width:100%;
 }
 
+.ct-null {
+    color:rgba(99,99,99,0.7);
+    text-align: center;
+}
+
 .ct-left-panel {
     width:15%;
     min-width:200px;
