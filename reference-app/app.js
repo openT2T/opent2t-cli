@@ -434,7 +434,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
                 //This is a workaround because angular doesn't handle binding to array elements well.
                 for (let j = 0; j < platform.entities[0].resources.length; j++) {
                     let resource = platform.entities[0].resources[j];
-                    if (resource.rt[0] === 'oic.r.mode' && resource.modes !== undefined) {
+                    if (resource.rt[0] === 'oic.r.mode' && typeof resource.modes !== 'undefined') {
                         addDisplayValue(controlId, resource.id, 'currentMode', resource.modes[0]);
                     }
                     else if (resource.rt[0] === 'org.opent2t.r.fan') {
