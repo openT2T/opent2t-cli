@@ -153,6 +153,22 @@
                                             </select>
                                         <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{displayValues[platform.info.opent2t.controlId + '_' + resource.id].currentMode}}</span>
                                     </div>
+                                    <div ng-if="resource.rt[0] === 'org.opent2t.r.fan'">
+                                        <select ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1"
+                                            class="ct-value-select form-control" ng-model="displayValues[platform.info.opent2t.controlId + '_' + resource.id].activeMode"
+                                            ng-change="setFanMode(platform, resource)">"
+                                                <option ng-repeat="option in resource.supportedModes" value="{{option}}">{{option}}</option>
+                                        </select>
+                                        <div class="ct-null" ng-if="resource.supportedModes.indexOf('timer') === -1">fan timer not avalible</div>
+                                        <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1 && resource.supportedModes.indexOf('timer') !== -1">
+                                            <input class="ct-text-input form-control" ng-disabled="state.busy || resource.if.indexOf('oic.if.a') === -1" type="number"
+                                                name="input" ng-model="displayValues[platform.info.opent2t.controlId + '_' + resource.id].timer">
+                                            <div class="icon-button" title="Set" ng-if="resource.if.indexOf('oic.if.a') !== -1" ng-click="state.busy || setFanTimer(platform, resource);">
+                                                <i class="fa fa-arrow-circle-right resource-button"></i>
+                                            </div>
+                                        </div>
+                                        <span ng-if="resource.if.indexOf('oic.if.a') === -1">{{displayValues[platform.info.opent2t.controlId + '_' + resource.id].activeMode}}</span>
+                                    </div>
                                     <div ng-if="resource.rt[0] === 'oic.r.colour.chroma'">
                                         <div class="ct-temp-controls" ng-if="resource.if.indexOf('oic.if.a') !== -1">
                                             <input class="ct-text-input form-control" ng-disabled="state.busy" type="number" name="input" ng-model="resource.ct">

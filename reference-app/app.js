@@ -20,7 +20,6 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
 
     $scope.loadData = function () {
         $q.all([$scope.loadOnboardingInfo()]);
-
         $scope.remoteApp.loadConfigs().then((files) => {
             $scope.configuredHubs = files;
             $scope.loading = false;
@@ -333,6 +332,33 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         });
     }
 
+    $scope.setFanMode = function (device, property) {
+        let controlId = device.info.opent2t.controlId;
+        let propVals = $scope.displayValues[`${controlId}_${property.id}`];
+        setDeviceProperty(device, property, { activeMode: propVals.activeMode }).then(info => {
+            property.activeMode = info.activeMode;
+            addDisplayValue(controlId, property.id, 'activeMode', property.activeMode);
+            property.timer = info.timer;
+            addDisplayValue(controlId, property.id, 'timer',  property.timer);
+        }).catch(error => {
+            logError(error);
+        });
+    }
+
+    $scope.setFanTimer = function (device, property) {
+        let controlId = device.info.opent2t.controlId;
+        let propVals = $scope.displayValues[`${controlId}_${property.id}`];
+        setDeviceProperty(device, property, { timer: propVals.timer }).then(info => {
+            property.activeMode = info.activeMode;
+            addDisplayValue(controlId, property.id, 'activeMode', property.activeMode);
+            property.timer = info.timer;
+            addDisplayValue(controlId, property.id, 'timer',  property.timer);
+        }).catch(error => {
+            logError(error);
+        });
+    }
+
+
     $scope.invokeDeviceMethod = function (device, methodName, params) {
         clearLog();
         $scope.state.busy = true;
@@ -411,8 +437,12 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
                 //This is a workaround because angular doesn't handle binding to array elements well.
                 for (let j = 0; j < platform.entities[0].resources.length; j++) {
                     let resource = platform.entities[0].resources[j];
-                    if (resource.rt[0] === 'oic.r.mode' && resource.modes !== undefined) {
+                    if (resource.rt[0] === 'oic.r.mode' && typeof resource.modes !== 'undefined') {
                         addDisplayValue(controlId, resource.id, 'currentMode', resource.modes[0]);
+                    }
+                    else if (resource.rt[0] === 'org.opent2t.r.fan') {
+                        addDisplayValue(controlId, resource.id, 'activeMode', resource.activeMode);
+                        addDisplayValue(controlId, resource.id, 'timer', resource.timer);
                     }
                     else if (resource.rt[0] === 'oic.r.colour.rgb') {
                         addDisplayValue(controlId, resource.id, 'currentRed', resource.rgbValue[0]);
