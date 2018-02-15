@@ -283,6 +283,9 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     }
     $scope.setTemperatureValue = function (device, property, value) {
         setDeviceProperty(device, property, { temperature: value, units: property.units }).then(info => {
+            if (Array.isArray(info) && info.length>0) {
+                info = info[0];
+            }
             property.temperature = info.temperature;
             if (!!info.units) {
                 property.units = info.units;
