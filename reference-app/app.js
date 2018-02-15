@@ -199,7 +199,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
         return true;
     }
 
-    $scope.getResourceStyle = function(resource) {
+    $scope.getResourceStyle = function (resource) {
         let style = {};
 
         if (resource.rt[0] === 'oic.r.colour.rgb') {
@@ -283,7 +283,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
     }
     $scope.setTemperatureValue = function (device, property, value) {
         setDeviceProperty(device, property, { temperature: value, units: property.units }).then(info => {
-            if (Array.isArray(info) && info.length>0) {
+            if (Array.isArray(info) && info.length > 0) {
                 info = info[0];
             }
             property.temperature = info.temperature;
@@ -342,7 +342,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
             property.activeMode = info.activeMode;
             addDisplayValue(controlId, property.id, 'activeMode', property.activeMode);
             property.timer = info.timer;
-            addDisplayValue(controlId, property.id, 'timer',  property.timer);
+            addDisplayValue(controlId, property.id, 'timer', property.timer);
         }).catch(error => {
             logError(error);
         });
@@ -355,7 +355,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', 'remote', 'config', 
             property.activeMode = info.activeMode;
             addDisplayValue(controlId, property.id, 'activeMode', property.activeMode);
             property.timer = info.timer;
-            addDisplayValue(controlId, property.id, 'timer',  property.timer);
+            addDisplayValue(controlId, property.id, 'timer', property.timer);
         }).catch(error => {
             logError(error);
         });
